@@ -13,8 +13,12 @@ export class TasksService {
     },
   ];
 
-  getAllTasks() {
+  getAllTasks(): Task[] {
     return this.tasks;
+  }
+
+  getTaskById(id: string): Task {
+    return this.tasks.find((task) => task.id === id);
   }
 
   createTask(title: string, description: string): Task {
@@ -27,7 +31,22 @@ export class TasksService {
     return newTask;
   }
 
-  getTaskById(id: string): Task {
-    return this.tasks.find((task) => task.id === id);
+  updateTask(id: string, title: string, description: string): Task {
+    const task = this.getTaskById(id);
+    if (!task) {
+      throw new Error(`Task with id ${id} not found`);
+    }
+    task.title = title;
+    task.description = description;
+    return task;
+  }
+
+  updateStatus(id: string, status: TaskStatus): Task {
+    const task = this.getTaskById(id);
+    if (!task) {
+      throw new Error(`Task with id ${id} not found`);
+    }
+    task.status = status;
+    return task;
   }
 }
