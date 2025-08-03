@@ -5,6 +5,11 @@ import configuration from './config/configuration';
 import { validationSchema } from './config/validation';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from './database/database.module';
+import { UsersController } from './modules/users/users.controller';
+import { UsersService } from './modules/users/users.service';
+import { UsersModule } from './modules/users/users.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
 
 @Module({
   imports: [
@@ -30,6 +35,9 @@ import { DatabaseModule } from './database/database.module';
 
     TasksModule,
     DatabaseModule,
+    UsersModule,
+    RolesModule,
+    PermissionsModule,
   ],
   controllers: [],
   providers: [],
