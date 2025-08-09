@@ -33,8 +33,7 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
       inject: [ConfigService],
     }),
 
-    TasksModule,
-    DatabaseModule,
+    // DatabaseModule,
     UsersModule,
     RolesModule,
     PermissionsModule,
