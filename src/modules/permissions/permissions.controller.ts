@@ -1,24 +1,12 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  CreatePermissionDto,
-  PermissionResponseDto,
-  UpdatePermissionDto,
-} from './dto/permission.dto';
+import { CreatePermissionDto, PermissionDeletedDto, PermissionResponseDto, UpdatePermissionDto } from './dto/permission.dto';
 
 @ApiTags('Permissions')
 @Controller('permissions')
 export class PermissionsController {
-  constructor(private permissionsService: PermissionsService) {}
+  constructor(private permissionsService: PermissionsService) { }
 
   @Get('v1')
   @ApiOperation({
@@ -112,7 +100,7 @@ export class PermissionsController {
   @ApiResponse({ status: 404, description: 'Permission not found' })
   deletePermission(
     @Param('permissionuuid') permissionuuid: string,
-  ): Promise<void> {
+  ): Promise<PermissionDeletedDto> {
     return this.permissionsService.deletePermission(permissionuuid);
   }
 }

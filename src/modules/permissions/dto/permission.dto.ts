@@ -6,8 +6,7 @@ export class CreatePermissionDto {
 
 export class UpdatePermissionDto {
   permissionname?: string = 'Actualizar usuario';
-  permissiondesc?: string =
-    'Permite actualizar la información de un usuario existente';
+  permissiondesc?: string = 'Permite actualizar la información de un usuario existente';
   permissioncode?: string = 'UPDATE_USER';
 }
 
@@ -15,13 +14,19 @@ export class PermissionResponseDto {
   permissionuuid: string | null;
   permissionname: string | null;
   permissiondesc: string | null;
+  permissioncode: string | null;
   isActive?: boolean | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
 }
 
 export class PermissionInRoleDto {
   permissionuuid: string | null;
   permissionname: string | null;
   permissiondesc: string | null;
+  permissioncode: string | null;
+}
+
+export class PermissionDeletedDto {
+  message: string;
+  rolename: string;
+  statusCode: string;
 }

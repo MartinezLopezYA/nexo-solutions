@@ -8,7 +8,8 @@ export class DatabaseService {
   async testConnection(): Promise<string> {
     try {
       await this.dataSource.query('SELECT 1');
-      return '✅ Database connection successful!';
+      const dbName = this.dataSource.options.database;
+      return `✅ Database connection successful! Connected to "${dbName}".`;
     } catch (error) {
       console.error('❌ Database connection failed:', error.message);
       return '❌ Database connection failed!';

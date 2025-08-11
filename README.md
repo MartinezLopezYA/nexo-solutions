@@ -56,6 +56,13 @@ $ npm run migration:run
 
 # revert
 $ npm run migration:revert
+
+# Data migration generate
+$ npx typeorm migration:create src/migrations/SeedInitialData
+
+# Data migration run
+$ npx typeorm-ts-node-commonjs migration:run -d ./data-source.ts
+
 ```
 
 ## Run tests

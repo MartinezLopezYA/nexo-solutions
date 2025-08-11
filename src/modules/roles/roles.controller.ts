@@ -1,21 +1,7 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
-import {
-  CreateRoleDto,
-  RoleResponseDto,
-  RoleWithPermissionsDto,
-  UpdateRoleDto,
-} from './dto/role.dto';
-import { Role } from './entities/role.entity';
+import { CreateRoleDto, RoleDeletedDto, RoleResponseDto, RoleWithPermissionsDto, UpdateRoleDto } from './dto/role.dto';
 
 @ApiTags('Roles')
 @Controller('roles')
@@ -60,7 +46,7 @@ export class RolesController {
   @ApiResponse({
     status: 200,
     description: 'Role with permissions',
-    type: RoleResponseDto,
+    type: RoleWithPermissionsDto,
   })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async getRoleWithPermissions(
@@ -126,7 +112,7 @@ export class RolesController {
   })
   @ApiResponse({ status: 204, description: 'Role deleted successfully' })
   @ApiResponse({ status: 404, description: 'Role not found' })
-  async deleteRole(@Param('roleuuid') roleuuid: string): Promise<void> {
+  async deleteRole(@Param('roleuuid') roleuuid: string): Promise<RoleDeletedDto> {
     return this.rolesService.deleteRole(roleuuid);
   }
 
@@ -138,13 +124,13 @@ export class RolesController {
   @ApiResponse({
     status: 200,
     description: 'Permissions assigned successfully',
-    type: Role,
+    type: RoleWithPermissionsDto,
   })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async assignPermissionsToRole(
     @Param('roleuuid') roleuuid: string,
     @Body() permissionuuids: string[],
-  ): Promise<Role> {
+  ): Promise<RoleWithPermissionsDto> {
     return this.rolesService.assignPermissionsToRole(roleuuid, permissionuuids);
   }
 }

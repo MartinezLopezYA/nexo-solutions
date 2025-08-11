@@ -1,10 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('port');
   app.setGlobalPrefix('nexo-solutions/api');
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
   const config = new DocumentBuilder()
     .setTitle('Nexo Solutions API')
     .setDescription('API documentation for Nexo Solutions')
@@ -24,6 +34,6 @@ async function bootstrap() {
   });
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('nexo-solutions/api', app, document);
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(port || 3000);
 }
 bootstrap();

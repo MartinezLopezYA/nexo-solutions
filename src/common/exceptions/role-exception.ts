@@ -5,15 +5,3 @@ export class RoleException extends HttpException {
     super(message, status);
   }
 }
-
-export class RoleNotFoundException extends HttpException {
-  constructor(roleId: string) {
-    super(`Role with ID ${roleId} not found`, HttpStatus.NOT_FOUND);
-  }
-}
-
-export class RoleAlreadyExistsException extends HttpException {
-  constructor(roleName: string) {
-    super(`Role with name ${roleName} already exists`, HttpStatus.CONFLICT);
-  }
-}

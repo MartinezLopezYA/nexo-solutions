@@ -1,0 +1,15 @@
+Manejar roles globales, es decir que se van axponer a los usuarios, algunas excepciones serian
+* SuperAdmin
+
+Manejar permisos globales, es decir que se van axponer a los usuarios, algunas excepciones serian
+* Crear comercios,
+* Crear Permisos,
+* Actualizar permisos,
+* Desactivar comercios.
+* Entre otros.
+
+Los Roles cuando se asignen por comercio (cliente) cada uno podra gerstionarse sus propios permisos debera cambiar la validación 
+
+Creación de comercios 
+
+validadores mas robustos en los dtos @IsNotEmpty, @IsEmail, @IsUrl, @IsDate, @IsPositive, @IsPositive...........

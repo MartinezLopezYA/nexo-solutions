@@ -13,5 +13,8 @@ export default new DataSource({
   password: config.database.password,
   database: config.database.database,
   entities: ['src/modules/**/entities/*.entity.ts'],
-  migrations: ['src/database/migrations/*.ts'],
+  migrations: [
+    'src/database/migrations/*.ts',
+    'src/database/seeds/*.ts',
+  ],
 });

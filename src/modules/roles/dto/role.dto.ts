@@ -16,15 +16,15 @@ export class RoleResponseDto {
   roleuuid: string | null;
   rolename: string | null;
   roledesc: string | null;
+  rolecode: string | null;
   isActive?: boolean | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
 }
 
 export class RoleWithPermissionsDto {
   roleuuid: string | null;
   rolename: string | null;
   roledesc: string | null;
+  rolecode: string | null;
   permissions: PermissionInRoleDto[] | null;
 }
 
@@ -32,4 +32,11 @@ export class RoleInUser {
   roleuuid: string | null;
   rolename: string | null;
   roledesc: string | null;
+}
+
+
+export class RoleDeletedDto {
+  message: string;
+  rolename: string;
+  statusCode: string;
 }
