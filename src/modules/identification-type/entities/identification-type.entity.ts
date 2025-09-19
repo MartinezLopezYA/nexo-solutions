@@ -4,13 +4,13 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class IdentificationType {
 
     @PrimaryGeneratedColumn('uuid')
-    identificationTypeUuid: string;
+    identificationtypeuuid: string;
 
     @Column({ nullable: false, unique: true, length: 100 })
-    identificationTypeName: string;
+    identificationtypename: string;
 
     @Column({ nullable: false, unique: true, length: 10 })
-    identificationTypeCode: string;
+    identificationtypecode: string;
 
     @Column({ nullable: true, type: 'boolean', default: true })
     isActive: boolean;
