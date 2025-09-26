@@ -1,12 +1,24 @@
+import { IsString } from "class-validator";
+
 export class CreatePermissionDto {
+  @IsString()
   permissionname: string = 'Crear usuario';
+
+  @IsString()
   permissiondesc?: string = 'Permite crear un nuevo usuario en el sistema';
+
+  @IsString()
   permissioncode?: string = 'CREATE_USER';
 }
 
 export class UpdatePermissionDto {
+  @IsString()
   permissionname?: string = 'Actualizar usuario';
+
+  @IsString()
   permissiondesc?: string = 'Permite actualizar la información de un usuario existente';
+
+  @IsString()
   permissioncode?: string = 'UPDATE_USER';
 }
 

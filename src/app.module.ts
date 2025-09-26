@@ -7,6 +7,8 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
+import { LocationModule } from './modules/location/location.module';
+import { IdentificationTypeModule } from './modules/identification-type/identification-type.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
     UsersModule,
     RolesModule,
     PermissionsModule,
+    LocationModule,
+    IdentificationTypeModule,
   ],
   controllers: [],
   providers: [],
