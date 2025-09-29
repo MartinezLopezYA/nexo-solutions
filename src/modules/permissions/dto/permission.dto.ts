@@ -33,7 +33,6 @@ export class PermissionResponseDto {
 export class PermissionInRoleDto {
   permissionuuid: string | null;
   permissionname: string | null;
-  permissiondesc: string | null;
   permissioncode: string | null;
 }
 

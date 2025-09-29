@@ -140,7 +140,7 @@ export class UserAditionalResponseDto {
   isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  roles?: RoleInUser[] | null;
+  roles?: RoleInUser[] | [];
 }
 
 export class UserWithRolesDto {
@@ -150,7 +150,7 @@ export class UserWithRolesDto {
   username: string;
   useremail: string;
   userphone?: string;
-  roles: RoleInUser[] | null;
+  roles: RoleInUser[] | [];
 }
 
 export class UserStatusDto {

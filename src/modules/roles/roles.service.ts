@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateRoleDto, RoleDeletedDto, RoleResponseDto, RoleWithPermissionsDto, UpdateRoleDto } from './dto/role.dto';
 import { Permission } from '../permissions/entities/permission.entity';
 import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
@@ -11,6 +11,8 @@ export class RolesService {
   constructor(
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    @InjectRepository(Permission)
+    private readonly permissionRepository: Repository<Permission>,
   ) { }
 
   async getAllRoles(): Promise<RoleResponseDto[]> {
@@ -247,9 +249,13 @@ export class RolesService {
         );
       }
 
-      const permissions = await this.roleRepository.manager.findByIds(Permission, permissionuuids);
+      const idsArray = Array.isArray(permissionuuids) ? permissionuuids : Object.values(permissionuuids);
 
-      if (permissions.length !== permissionuuids.length) {
+      const permissions = await this.permissionRepository.find({
+        where: { permissionuuid: In(idsArray) },
+      });
+
+      if (permissions.length !== idsArray.length) {
         throw new NotFoundException(
           `Some permissions not found for role with uuid ${roleuuid}`,
           HttpStatus.NOT_FOUND,

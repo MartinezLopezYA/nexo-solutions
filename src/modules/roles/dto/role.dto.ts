@@ -36,13 +36,13 @@ export class RoleWithPermissionsDto {
   rolename: string | null;
   roledesc: string | null;
   rolecode: string | null;
-  permissions: PermissionInRoleDto[] | null;
+  permissions: PermissionInRoleDto[] | [];
 }
 
 export class RoleInUser {
   roleuuid: string | null;
   rolename: string | null;
-  roledesc: string | null;
+  permissions: PermissionInRoleDto[] | [];
 }
 
 export class RoleDeletedDto {

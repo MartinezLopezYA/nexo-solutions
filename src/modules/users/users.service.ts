@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
-import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UsersBasicResponseDto } from './dto/user.dto';
+import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UserWithRolesDto, UsersBasicResponseDto } from './dto/user.dto';
 import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from '../roles/entities/role.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,8 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        @InjectRepository(Role)
+        private readonly roleRepository: Repository<Role>,
     ) { }
 
     async getUserByEmail(email: string): Promise<User> {
@@ -34,7 +37,9 @@ export class UsersService {
                 },
                 relations: {
                     useridentificationtype: true,
-                    roles: true,
+                    roles: {
+                        permissions: true,
+                    },
                     city: {
                         department: {
                             country: true,
@@ -83,7 +88,15 @@ export class UsersService {
                     isActive: user.isActive,
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,
-                    roles: user?.roles
+                    roles: user?.roles.map(role => ({
+                        roleuuid: role.roleuuid,
+                        rolename: role.rolename,
+                        permissions: role?.permissions.filter((permission) => permission.isActive).map((permission) => ({
+                            permissionuuid: permission.permissionuuid,
+                            permissionname: permission.permissionname,
+                            permissioncode: permission.permissioncode
+                        })) || null,
+                    })) || null,
                 }
             };
             return userResponse;
@@ -333,6 +346,60 @@ export class UsersService {
             return userResponse;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while updating the user status');
+        }
+    }
+
+    async assignRolesToUser(useruuid: string, roleuuids: string[]): Promise<UserWithRolesDto> {
+        try {
+            const user = await this.userRepository.findOne({
+                where: { useruuid: useruuid },
+                relations: ['roles'],
+            });
+
+            if (!user) {
+                throw new NotFoundException(
+                    `User with uuid ${useruuid} not found`,
+                    HttpStatus.NOT_FOUND,
+                    'NF_USER_ERROR',
+                );
+            }
+
+            const idsArray = Array.isArray(roleuuids) ? roleuuids : Object.values(roleuuids);
+
+            const roles = await this.roleRepository.findBy({
+                roleuuid: In(idsArray),
+            });
+
+            if (roles.length !== idsArray.length) {
+                throw new NotFoundException(
+                    `Some roles not found for user with uuid ${useruuid}`,
+                    HttpStatus.NOT_FOUND,
+                    'NFR_USER_ERROR',
+                );
+            }
+
+            user.roles = roles;
+            const savedUser = await this.userRepository.save(user);
+            const userResponse: UserWithRolesDto = {
+                useruuid: savedUser.useruuid,
+                firstname: savedUser.firstname,
+                lastname: savedUser.lastname,
+                username: savedUser.username,
+                useremail: savedUser.useremail,
+                userphone: savedUser.userphone,
+                roles: savedUser.roles.map(role => ({
+                    roleuuid: role.roleuuid,
+                    rolename: role.rolename,
+                    permissions: role?.permissions?.map(permission => ({
+                        permissionuuid: permission.permissionuuid,
+                        permissionname: permission.permissionname,
+                        permissioncode: permission.permissioncode,
+                    })) || [],
+                })),
+            }
+            return userResponse;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while assigning roles to the user');
         }
     }
 

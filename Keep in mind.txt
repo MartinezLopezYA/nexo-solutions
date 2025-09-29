@@ -13,3 +13,102 @@ Los Roles cuando se asignen por comercio (cliente) cada uno podra gerstionarse s
 Creación de comercios 
 
 validadores mas robustos en los dtos @IsNotEmpty, @IsEmail, @IsUrl, @IsDate, @IsPositive, @IsPositive...........
+
+
+{
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "editor.fontFamily": "Jetbrains Mono",
+  "editor.fontLigatures": true,
+  "window.zoomLevel": -1,
+  "emmet.syntaxProfiles": {
+    "html": {
+      "inlineBreak": true
+    }
+  },
+  "php.validate.executablePath": "c:\\php\\php.exe",
+  "editor.guides.bracketPairs": true,
+  "explorer.compactFolders": false,
+  "editor.minimap.enabled": false,
+  "editor.stickyScroll.enabled": false,
+  "database-client.autoSync": true,
+  "workbench.colorTheme": "Dracula Theme",
+  "editor.wordWrap": "on",
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "diffEditor.codeLens": true,
+  "files.associations": {
+    "*.ts": "typescript"
+  },
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "workbench.iconTheme": "material-icon-theme",
+  "material-icon-theme.folders.customClones": [
+    {
+      "name": "users-admin",
+      "base": "admin",
+      "color": "blue-700",
+      "folderNames": ["users"],
+      "rootFolderNames": ["modules"]
+    },
+    {
+      "name": "roles-admin",
+      "base": "admin",
+      "color": "purple-400",
+      "folderNames": ["roles"],
+      "rootFolderNames": ["modules"]
+    },
+    {
+      "name": "permissions-admin",
+      "base": "config",
+      "color": "green-400",
+      "folderNames": ["permissions"],
+      "rootFolderNames": ["modules"]
+    },
+    {
+      "name": "entities",
+      "base": "database",
+      "icon": "error",
+      "color": "blue-400",
+      "folderNames": ["entities"],
+      "rootFolderNames": ["modules"]
+    },
+    {
+      "name": "dto",
+      "base": "database",
+      "color": "green-500",
+      "folderNames": ["dto"],
+      "rootFolderNames": ["modules"]
+    },
+    {
+      "name": "exceptions",
+      "base": "error",
+      "color": "red-500",
+      "folderNames": ["exceptions"],
+      "rootFolderNames": ["common"]
+    }
+  ],
+  "material-icon-theme.activeIconPack": "nest",
+  // "material-icon-theme.activeIconPack": "angular",
+  "json.schemas": [],
+  "json.validate.enable": false,
+  "json.schemaDownload.enable": false,
+  "json.maxItemsComputed": 5000,
+  "problems.decorations.enabled": false,
+  "extensions.ignoreRecommendations": true
+}

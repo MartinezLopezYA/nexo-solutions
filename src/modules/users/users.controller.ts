@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Delete, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UsersBasicResponseDto } from './dto/user.dto';
+import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UserWithRolesDto, UsersBasicResponseDto } from './dto/user.dto';
 import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/undefined-to-null-interceptor.interceptor';
 
 @ApiTags('Users')
@@ -51,7 +51,9 @@ export class UsersController {
         type: UserResponseDto,
     })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async getUserById(@Param('useruuid') useruuid: string): Promise<UserResponseDto> {
+    async getUserById(
+        @Param('useruuid') useruuid: string
+    ): Promise<UserResponseDto> {
         return this.usersService.getUserById(useruuid);
     }
 
@@ -66,7 +68,9 @@ export class UsersController {
         type: UsersBasicResponseDto,
     })
     @ApiResponse({ status: 400, description: 'User already exists' })
-    async addUser(@Body() user: UserCreateDto): Promise<UsersBasicResponseDto> {
+    async addUser(
+        @Body() user: UserCreateDto
+    ): Promise<UsersBasicResponseDto> {
         return this.usersService.addUser(user);
     }
 
@@ -81,7 +85,9 @@ export class UsersController {
         type: UserStatusDto,
     })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async updateUserStatus(@Param('useruuid') useruuid: string): Promise<UserStatusDto> {
+    async updateUserStatus(
+        @Param('useruuid') useruuid: string
+    ): Promise<UserStatusDto> {
         return this.usersService.updateUserStatus(useruuid);
     }
 
@@ -96,7 +102,10 @@ export class UsersController {
         type: UserResponseDto,
     })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async updateUser(@Param('useruuid') useruuid: string, @Body() user: UserUpdateDto): Promise<UserResponseDto> {
+    async updateUser(
+        @Param('useruuid') useruuid: string,
+        @Body() user: UserUpdateDto
+    ): Promise<UserResponseDto> {
         return this.usersService.updateUser(useruuid, user);
     }
 
@@ -111,8 +120,27 @@ export class UsersController {
         type: UserStatusDto,
     })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async deleteUser(@Param('useruuid') useruuid: string): Promise<UserStatusDto> {
+    async deleteUser(
+        @Param('useruuid') useruuid: string
+    ): Promise<UserStatusDto> {
         return this.usersService.removeUser(useruuid);
     }
 
+    @Post('v1/:useruuid/roles')
+    @ApiOperation({
+        summary: 'Assign roles to a user',
+        description: 'This endpoint allows you to assign roles to a user.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Roles assigned successfully',
+        type: UserWithRolesDto,
+    })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    async assignRolesToUser(
+        @Param('useruuid') useruuid: string,
+        @Body() roleuuids: string[],
+    ): Promise<UserWithRolesDto> {
+        return this.usersService.assignRolesToUser(useruuid, roleuuids);
+    }
 }
