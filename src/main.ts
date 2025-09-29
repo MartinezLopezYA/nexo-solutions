@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { UndefinedToNullInterceptorInterceptor } from './common/interceptors/undefined-to-null-interceptor.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,9 +13,10 @@ async function bootstrap() {
   app.setGlobalPrefix('nexo-solutions/api');
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: true,
+    forbidNonWhitelisted: false,
     transform: true,
   }));
+  app.useGlobalInterceptors(new UndefinedToNullInterceptorInterceptor());
   const config = new DocumentBuilder()
     .setTitle('Nexo Solutions API')
     .setDescription('API documentation for Nexo Solutions')

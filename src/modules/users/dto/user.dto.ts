@@ -1,99 +1,122 @@
-import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, IsUUID, Length, Min } from 'class-validator';
+import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, IsUUID, Length, Matches, MinLength, IsOptional } from 'class-validator';
 import { IdentificationTypeToUserDto } from 'src/modules/identification-type/dto/identification-type.dto';
 import { CityWithDepartmentAndCountryDto } from 'src/modules/location/dto/city.dto';
 import { RoleInUser } from 'src/modules/roles/dto/role.dto';
+import { Type } from 'class-transformer';
 
 export class UserCreateDto {
   @IsString()
-  firstname: string = 'Andres';
+  firstname: string;
 
   @IsString()
-  lastname: string = 'Martinez';
+  lastname: string;
 
   @IsString()
-  username: string = 'andresmartinez';
+  username: string;
 
   @IsString()
   @IsEmail()
-  useremail: string = 'andresmartinez@gmail.com';
+  useremail: string;
 
   @IsString()
-  @Min(8)
-  password: string = 'Andres123!';
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, { message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character' })
+  password: string;
 
   @IsString()
   @Length(10)
-  userphone: string = '3182848957';
+  userphone: string;
 
   @IsUUID()
-  useridentificationtype: string = '123e4567-e89b-12d3-a456-426614174000';
+  identificationtypeuuid: string;
 
   @IsNumber()
-  useridentificationnumber: number = 123456789;
+  useridentificationnumber: number;
 
   @IsString()
-  usergender: string = 'M';
+  @IsOptional()
+  usergender?: string;
 
   @IsString()
-  userprofession?: string = 'Software Engineer';
+  @IsOptional()
+  userprofession?: string;
 
   @IsUUID()
-  cityuuid: string = '123e4567-e89b-12d3-a456-426614174000';
+  @IsOptional()
+  cityuuid?: string;
 
   @IsString()
-  useraddress?: string = '123 Main St';
+  @IsOptional()
+  useraddress?: string;
 
+  @IsOptional()
   @IsDate()
-  dateOfBirth?: Date = new Date();
+  @Type(() => Date)
+  dateOfBirth?: Date;
 
   @IsBoolean()
-  isActive?: boolean = true;
+  @IsOptional()
+  isActive?: boolean;
 }
 
-export class UserUpdateBasicDto {
+export class UserUpdateDto {
   @IsString()
-  firstname: string = 'Andres';
+  @IsOptional()
+  firstname?: string;
 
   @IsString()
-  lastname: string = 'Martinez';
+  @IsOptional()
+  lastname?: string;
 
   @IsString()
-  username: string = 'andresmartinez';
+  @IsOptional()
+  username?: string;
 
-  @IsString()
-  @IsEmail()
-  useremail: string = 'andresmartinez@gmail.com';
-
-  @IsString()
-  @Min(8)
-  password: string = 'Andres123!';
-
-  @IsString()
   @Length(10)
-  userphone: string = '3182848957';
+  @IsOptional()
+  userphone?: string;
 
   @IsUUID()
-  useridentificationtype: string = '123e4567-e89b-12d3-a456-426614174000';
+  @IsOptional()
+  identificationtypeuuid?: string;
 
   @IsNumber()
-  useridentificationnumber: number = 123456789;
-}
-
-export class UserUpdateAdditionalDto {
-  @IsString()
-  usergender: string = 'M';
+  @IsOptional()
+  useridentificationnumber?: number;
 
   @IsString()
-  userprofession?: string = 'Software Engineer';
+  @IsOptional()
+  usergender?: string;
+
+  @IsString()
+  @IsOptional()
+  userprofession?: string;
 
   @IsUUID()
-  cityuuid: string = '123e4567-e89b-12d3-a456-426614174000';
+  @IsOptional()
+  cityuuid?: string;
 
   @IsString()
-  useraddress?: string = '123 Main St';
+  @IsOptional()
+  useraddress?: string;
 
+  @IsOptional()
   @IsDate()
-  dateOfBirth?: Date = new Date();
+  @Type(() => Date)
+  dateOfBirth?: Date;
+}
+
+export class UsersBasicResponseDto {
+  useruuid: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  useremail: string;
+  userphone: string;
+  userprofession: string;
+  useridentificationtype: IdentificationTypeToUserDto;
+  useridentificationnumber: number;
+  isActive: boolean;
 }
 
 export class UserResponseDto {
@@ -103,8 +126,8 @@ export class UserResponseDto {
   username: string;
   useremail: string;
   userphone: string;
-  useridentificationtype: IdentificationTypeToUserDto;
-  useridentificationnumber: number;
+  useridentificationtype?: IdentificationTypeToUserDto;
+  useridentificationnumber?: number;
   additionalInfo?: UserAditionalResponseDto;
 }
 
@@ -130,6 +153,9 @@ export class UserWithRolesDto {
   roles: RoleInUser[] | null;
 }
 
-export class UserUpdateStatusDto {
-  isActive?: boolean;
+export class UserStatusDto {
+  useruuid: string;
+  message: string;
+  statusCode: number;
 }
+

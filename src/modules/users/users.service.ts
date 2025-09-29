@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
-import { UserAditionalResponseDto, UserResponseDto } from './dto/user.dto';
-import { NotFoundException } from 'src/common/exceptions/general-exception.';
+import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UsersBasicResponseDto } from './dto/user.dto';
+import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -13,9 +14,88 @@ export class UsersService {
         private readonly userRepository: Repository<User>,
     ) { }
 
-    async getAllUsers(): Promise<UserResponseDto[]> {
+    async getUserByEmail(email: string): Promise<User> {
+        return await this.userRepository.findOneBy({
+            useremail: email
+        });
+    }
+
+    async getUserByIdentificationNumber(identificationnumber: number): Promise<User> {
+        return await this.userRepository.findOneBy({
+            useridentificationnumber: identificationnumber
+        });
+    }
+
+    async getUserById(useruuid: string): Promise<UserResponseDto> {
+        try {
+            const user = await this.userRepository.findOne({
+                where: {
+                    useruuid: useruuid,
+                },
+                relations: {
+                    useridentificationtype: true,
+                    roles: true,
+                    city: {
+                        department: {
+                            country: true,
+                        }
+                    },
+                }
+            });
+
+            if (!user) {
+                throw new NotFoundException(
+                    'User not found',
+                    HttpStatus.NOT_FOUND,
+                    'NF_USER_ERROR',
+                );
+            }
+
+            const userResponse = {
+                useruuid: user.useruuid,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                username: user.username,
+                useremail: user.useremail,
+                userphone: user.userphone,
+                useridentificationtype: {
+                    identificationtypeuuid: user?.useridentificationtype.identificationtypeuuid,
+                    identificationtypename: user?.useridentificationtype.identificationtypename,
+                },
+                useridentificationnumber: user?.useridentificationnumber,
+                additionalInfo: {
+                    usergender: user?.usergender,
+                    userprofession: user?.userprofession,
+                    city: {
+                        cityuuid: user?.city?.cityuuid,
+                        cityname: user?.city?.cityname,
+                        department: {
+                            departmentuuid: user?.city?.department?.departmentuuid,
+                            departmentname: user?.city?.department?.departmentname,
+                            country: {
+                                countryuuid: user?.city?.department?.country?.countryuuid,
+                                countryname: user?.city?.department?.country?.countryname,
+                            },
+                        },
+                    },
+                    useraddress: user?.useraddress,
+                    dateOfBirth: user?.dateOfBirth,
+                    isActive: user.isActive,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                    roles: user?.roles
+                }
+            };
+            return userResponse;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while getting a user by id');
+        }
+    }
+
+    async getAllUsers(): Promise<UsersBasicResponseDto[]> {
         try {
             const users = await this.userRepository.find({
+                where: { isDeleted: false },
                 order: { firstname: 'ASC' },
                 relations: {
                     useridentificationtype: true,
@@ -41,34 +121,218 @@ export class UsersService {
                 username: user.username,
                 useremail: user.useremail,
                 userphone: user.userphone,
-                useridentificationtype: user.useridentificationtype,
-                useridentificationnumber: user.useridentificationnumber,
-                additionalInfo: {
-                    usergender: user.usergender,
-                    userprofession: user.userprofession,
-                    city: {
-                        cityuuid: user.city.cityuuid,
-                        cityname: user.city.cityname,
-                        department: {
-                            departmentuuid: user.city.department.departmentuuid,
-                            departmentname: user.city.department.departmentname,
-                            country: {
-                                countryuuid: user.city.department.country.countryuuid,
-                                countryname: user.city.department.country.countryname,
-                            }
-                        }
-                    },
-                    useraddress: user.useraddress,
-                    dateOfBirth: user.dateOfBirth,
-                    isActive: user.isActive,
-                    createdAt: user.createdAt,
-                    updatedAt: user.updatedAt,
-                    roles: user.roles,
-                }
-            } as UserResponseDto)) || [];
+                userprofession: user?.userprofession,
+                useridentificationtype: user?.useridentificationtype,
+                useridentificationnumber: user?.useridentificationnumber,
+                isActive: user.isActive
+            } as UsersBasicResponseDto)) || [];
             return userResponseDto;
         } catch (error) {
+            this.handleInternalError(error, 'An error occurred while getting all users');
+        }
+    }
+
+    async getActiveUsers(): Promise<UsersBasicResponseDto[]> {
+        try {
+            const users = await this.userRepository.find({
+                order: { firstname: 'ASC' },
+                where: {
+                    isDeleted: false,
+                    isActive: true
+                },
+            });
+            if (!users || users.length === 0) {
+                throw new NotFoundException(
+                    'No active users found',
+                    HttpStatus.NOT_FOUND,
+                    'NF_USER_ERROR',
+                );
+            }
+            const userResponseDto = users.map(user => ({
+                useruuid: user.useruuid,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                username: user.username,
+                useremail: user.useremail,
+                userphone: user.userphone,
+                userprofession: user?.userprofession,
+                useridentificationtype: user.useridentificationtype,
+                useridentificationnumber: user.useridentificationnumber,
+                isActive: user.isActive
+            } as UsersBasicResponseDto)) || [];
+            return userResponseDto;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while getting active users');
+        }
+    }
+
+    async addUser(user: UserCreateDto): Promise<UsersBasicResponseDto> {
+        try {
+            const userByEmail = await this.getUserByEmail(user.useremail);
+            if (userByEmail) {
+                throw new AlreadyExistsException(
+                    'User with email ' + user.useremail + ' already exists',
+                    HttpStatus.BAD_REQUEST,
+                    'AEN_USER_ERROR',
+                );
+            }
+
+            const userByIdentificationNumber = await this.getUserByIdentificationNumber(user.useridentificationnumber);
+            if (userByIdentificationNumber) {
+                throw new AlreadyExistsException(
+                    'User with identification number ' + user.useridentificationnumber + ' already exists',
+                    HttpStatus.BAD_REQUEST,
+                    'AEN_USER_ERROR',
+                );
+            }
+
+            const saltOrRounds = 10;
+            const hashedPassword = await bcrypt.hash(user.password, saltOrRounds);
+
+            const newUserData: DeepPartial<User> = {
+                ...user,
+                password: hashedPassword,
+                useridentificationtype: { identificationtypeuuid: user.identificationtypeuuid },
+                city: { cityuuid: user.cityuuid },
+            };
+
+            const newUser = this.userRepository.create(newUserData);
+            const savedUser = await this.userRepository.save(newUser);
+            const userResponse: UsersBasicResponseDto = {
+                useruuid: savedUser.useruuid,
+                firstname: savedUser.firstname,
+                lastname: savedUser.lastname,
+                username: savedUser.username,
+                useremail: savedUser.useremail,
+                userphone: savedUser.userphone,
+                userprofession: savedUser?.userprofession,
+                useridentificationtype: {
+                    identificationtypeuuid: savedUser.useridentificationtype.identificationtypeuuid,
+                    identificationtypename: savedUser.useridentificationtype.identificationtypename,
+                },
+                useridentificationnumber: savedUser.useridentificationnumber,
+                isActive: savedUser.isActive
+            }
+            return userResponse;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while adding a user');
+        }
+    }
+
+    async updateUserStatus(useruuid: string): Promise<UserStatusDto> {
+        try {
+            const existingUser = await this.userRepository.findOneBy({
+                useruuid: useruuid,
+            });
+
+            if (!existingUser) {
+                throw new NotFoundException(
+                    `User with uuid ${useruuid} not found`,
+                    HttpStatus.NOT_FOUND,
+                    'NF_USER_ERROR',
+                );
+            }
+
+            existingUser.isActive = !existingUser.isActive;
+            const savedUser = await this.userRepository.save(existingUser);
+            const userResponse: UserStatusDto = {
+                useruuid: savedUser.useruuid,
+                message: 'User status updated successfully',
+                statusCode: HttpStatus.OK,
+            };
+            return userResponse;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while updating the user status');
+        }
+    }
+
+    async updateUser(useruuid: string, user: UserUpdateDto): Promise<UserResponseDto> {
+        try {
+            const existingUser = await this.userRepository.findOneBy({
+                useruuid: useruuid,
+            });
+
+            if (!existingUser) {
+                throw new NotFoundException(
+                    `User with uuid ${useruuid} not found`,
+                    HttpStatus.NOT_FOUND,
+                    'NF_USER_ERROR',
+                );
+            }
+
+            const userUpdateData: DeepPartial<User> = {
+                ...user,
+                useridentificationtype: { identificationtypeuuid: user.identificationtypeuuid },
+                city: { cityuuid: user.cityuuid },
+            };
+
+            const updatedUser = Object.assign(existingUser, userUpdateData);
+            const savedUser = await this.userRepository.save(updatedUser);
+            const userResponse: UserResponseDto = {
+                useruuid: savedUser.useruuid,
+                firstname: savedUser.firstname,
+                lastname: savedUser.lastname,
+                username: savedUser.username,
+                useremail: savedUser.useremail,
+                userphone: savedUser.userphone,
+                useridentificationtype: {
+                    identificationtypeuuid: savedUser?.useridentificationtype?.identificationtypeuuid,
+                    identificationtypename: savedUser?.useridentificationtype?.identificationtypename,
+                },
+                useridentificationnumber: savedUser.useridentificationnumber,
+                additionalInfo: {
+                    usergender: savedUser.usergender,
+                    userprofession: savedUser.userprofession,
+                    city: {
+                        cityuuid: savedUser?.city?.cityuuid,
+                        cityname: savedUser?.city?.cityname,
+                        department: {
+                            departmentuuid: savedUser?.city?.department?.departmentuuid,
+                            departmentname: savedUser?.city?.department?.departmentname,
+                            country: {
+                                countryuuid: savedUser?.city?.department?.country?.countryuuid,
+                                countryname: savedUser?.city?.department?.country?.countryname,
+                            },
+                        },
+                    },
+                    useraddress: savedUser.useraddress,
+                    dateOfBirth: savedUser.dateOfBirth,
+                    isActive: savedUser.isActive,
+                    createdAt: savedUser.createdAt,
+                    updatedAt: savedUser.updatedAt,
+                    roles: savedUser.roles,
+                },
+            };
+            return userResponse;
+        } catch (error) {
             this.handleInternalError(error, 'An error occurred while updating the user');
+        }
+    }
+
+    async removeUser(useruuid: string): Promise<UserStatusDto> {
+        try {
+            const existingUser = await this.userRepository.findOneBy({
+                useruuid: useruuid,
+            });
+
+            if (!existingUser) {
+                throw new NotFoundException(
+                    `User with uuid ${useruuid} not found`,
+                    HttpStatus.NOT_FOUND,
+                    'NF_USER_ERROR',
+                );
+            }
+
+            existingUser.isDeleted = !existingUser.isDeleted;
+            const savedUser = await this.userRepository.save(existingUser);
+            const userResponse: UserStatusDto = {
+                useruuid: useruuid,
+                message: 'User deleted successfully',
+                statusCode: HttpStatus.OK,
+            };
+            return userResponse;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while updating the user status');
         }
     }
 

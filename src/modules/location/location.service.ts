@@ -21,7 +21,6 @@ export class LocationService {
         private readonly cityRepository: Repository<City>,
     ) { }
 
-
     async getAllCountries(): Promise<CountryResponseDto[]> {
         try {
             const countries = await this.countryRepository.find({

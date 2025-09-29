@@ -51,8 +51,11 @@ export class User {
   @Column({ nullable: true, type: 'date' })
   dateOfBirth: Date;
 
-  @Column({ nullable: true, type: 'boolean', default: false })
+  @Column({ nullable: true, type: 'boolean', default: true })
   isActive: boolean;
+
+  @Column({ nullable: true, type: 'boolean', default: false })
+  isDeleted: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
