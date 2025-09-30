@@ -10,16 +10,16 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port');
-  app.setGlobalPrefix('nexo-solutions/api');
+  app.setGlobalPrefix('zentriq-dev/api');
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: false,
+    forbidNonWhitelisted: true,
     transform: true,
   }));
   app.useGlobalInterceptors(new UndefinedToNullInterceptorInterceptor());
   const config = new DocumentBuilder()
-    .setTitle('Nexo Solutions API')
-    .setDescription('API documentation for Nexo Solutions')
+    .setTitle('Zentriq Dev API')
+    .setDescription('API documentation for Zentriq Dev')
     .setContact(
       'Andres Martinez',
       'https://portfolio-nine-dun-88.vercel.app',
@@ -40,7 +40,7 @@ async function bootstrap() {
     transform: true,
   }));
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('nexo-solutions/api', app, document);
+  SwaggerModule.setup('zentriq-dev/api', app, document);
   await app.listen(port || 3000);
 }
 bootstrap();

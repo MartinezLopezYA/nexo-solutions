@@ -1,4 +1,4 @@
-nexo-solutions@0.0.1 C:\Proyectos\Nestjs\nexo-solutions
+zentriq-dev@0.0.1 C:\Proyectos\Nestjs\zentriq-dev
 ├── @nestjs/cli@11.0.10
 ├── @nestjs/common@10.4.20
 ├── @nestjs/config@4.0.2
