@@ -2,13 +2,17 @@ import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, IsUUID, Length, Matches
 import { IdentificationTypeToUserDto } from 'src/modules/identification-type/dto/identification-type.dto';
 import { CityWithDepartmentAndCountryDto } from 'src/modules/location/dto/city.dto';
 import { RoleInUser } from 'src/modules/roles/dto/role.dto';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { capitalize, capitalizeFirstLetter } from 'src/common/utils/format';
+import { ProfessionInCategory } from 'src/modules/professions/dto/profession.dto';
 
 export class UserCreateDto {
   @IsString()
+  @Transform(({ value }) => capitalizeFirstLetter(value))
   firstname: string;
 
   @IsString()
+  @Transform(({ value }) => capitalizeFirstLetter(value))
   lastname: string;
 
   @IsString()
@@ -37,9 +41,9 @@ export class UserCreateDto {
   @IsOptional()
   usergender?: string;
 
-  @IsString()
+  @IsUUID()
   @IsOptional()
-  userprofession?: string;
+  professionuuid?: string;
 
   @IsUUID()
   @IsOptional()
@@ -47,6 +51,7 @@ export class UserCreateDto {
 
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => capitalize(value))
   useraddress?: string;
 
   @IsOptional()
@@ -62,10 +67,12 @@ export class UserCreateDto {
 export class UserUpdateDto {
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => capitalizeFirstLetter(value))
   firstname?: string;
 
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => capitalizeFirstLetter(value))
   lastname?: string;
 
   @IsString()
@@ -88,9 +95,9 @@ export class UserUpdateDto {
   @IsOptional()
   usergender?: string;
 
-  @IsString()
+  @IsUUID()
   @IsOptional()
-  userprofession?: string;
+  userprofessionuuid?: string;
 
   @IsUUID()
   @IsOptional()
@@ -98,6 +105,7 @@ export class UserUpdateDto {
 
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => capitalize(value))
   useraddress?: string;
 
   @IsOptional()
@@ -113,7 +121,7 @@ export class UsersBasicResponseDto {
   username: string;
   useremail: string;
   userphone: string;
-  userprofession: string;
+  userprofession: ProfessionInCategory;
   useridentificationtype: IdentificationTypeToUserDto;
   useridentificationnumber: number;
   isActive: boolean;
@@ -133,7 +141,7 @@ export class UserResponseDto {
 
 export class UserAditionalResponseDto {
   usergender?: string;
-  userprofession?: string;
+  userprofession?: ProfessionInCategory;
   city?: CityWithDepartmentAndCountryDto;
   useraddress?: string;
   dateOfBirth?: Date;

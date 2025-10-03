@@ -109,7 +109,7 @@ export class UsersController {
         return this.usersService.updateUser(useruuid, user);
     }
 
-    @Delete('v1/:useruuid')
+    @Delete('v1/:useruuid/remove')
     @ApiOperation({
         summary: 'Delete a user',
         description: 'This endpoint deletes a user.',
@@ -126,7 +126,7 @@ export class UsersController {
         return this.usersService.removeUser(useruuid);
     }
 
-    @Post('v1/:useruuid/roles')
+    @Post('v1/:useruuid/assign-roles')
     @ApiOperation({
         summary: 'Assign roles to a user',
         description: 'This endpoint allows you to assign roles to a user.',

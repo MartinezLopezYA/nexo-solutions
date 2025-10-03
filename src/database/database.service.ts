@@ -11,7 +11,6 @@ export class DatabaseService {
       const dbName = this.dataSource.options.database;
       return `✅ Database connection successful! Connected to "${dbName}".`;
     } catch (error) {
-      console.error('❌ Database connection failed:', error.message);
       return '❌ Database connection failed!';
     }
   }

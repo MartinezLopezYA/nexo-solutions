@@ -11,12 +11,16 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port');
   app.setGlobalPrefix('zentriq-dev/api');
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
-  app.useGlobalInterceptors(new UndefinedToNullInterceptorInterceptor());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
+  app.useGlobalInterceptors(
+    new UndefinedToNullInterceptorInterceptor()
+  );
   const config = new DocumentBuilder()
     .setTitle('Zentriq Dev API')
     .setDescription('API documentation for Zentriq Dev')
@@ -34,11 +38,13 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('zentriq-dev/api', app, document);
   await app.listen(port || 3000);

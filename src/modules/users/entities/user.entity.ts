@@ -1,3 +1,4 @@
+import { Profession } from '../../professions/entities/profession.entity';
 import { IdentificationType } from '../../identification-type/entities/identification-type.entity';
 import { City } from '../../location/entities/city.entity';
 import { Role } from '../../roles/entities/role.entity';
@@ -31,15 +32,16 @@ export class User {
   @JoinColumn({ name: 'identificationtypeuuid' })
   useridentificationtype: IdentificationType;
 
-  @Column({ nullable: false})
+  @Column({ nullable: false, unique: true })
   useridentificationnumber: number;
 
   // Additional information
   @Column({ nullable: true, length: 2 })
   usergender: string;
 
-  @Column({ nullable: true, length: 100 })
-  userprofession: string;
+  @ManyToOne(() => Profession)
+  @JoinColumn({ name: 'professionuuid' })
+  userprofession: Profession;
 
   @ManyToOne(() => City)
   @JoinColumn({ name: 'cityuuid' })

@@ -37,6 +37,7 @@ export class UsersService {
                 },
                 relations: {
                     useridentificationtype: true,
+                    userprofession: true,
                     roles: {
                         permissions: true,
                     },
@@ -112,6 +113,7 @@ export class UsersService {
                 order: { firstname: 'ASC' },
                 relations: {
                     useridentificationtype: true,
+                    userprofession: true,
                     roles: true,
                     city: {
                         department: {
@@ -153,6 +155,16 @@ export class UsersService {
                     isDeleted: false,
                     isActive: true
                 },
+                relations: {
+                    useridentificationtype: true,
+                    userprofession: true,
+                    roles: true,
+                    city: {
+                        department: {
+                            country: true,
+                        }
+                    },
+                }
             });
             if (!users || users.length === 0) {
                 throw new NotFoundException(
@@ -206,6 +218,7 @@ export class UsersService {
                 ...user,
                 password: hashedPassword,
                 useridentificationtype: { identificationtypeuuid: user.identificationtypeuuid },
+                userprofession: { professionuuid: user.professionuuid },
                 city: { cityuuid: user.cityuuid },
             };
 
@@ -276,6 +289,7 @@ export class UsersService {
             const userUpdateData: DeepPartial<User> = {
                 ...user,
                 useridentificationtype: { identificationtypeuuid: user.identificationtypeuuid },
+                userprofession: { professionuuid: user.userprofessionuuid },
                 city: { cityuuid: user.cityuuid },
             };
 
@@ -295,7 +309,7 @@ export class UsersService {
                 useridentificationnumber: savedUser.useridentificationnumber,
                 additionalInfo: {
                     usergender: savedUser.usergender,
-                    userprofession: savedUser.userprofession,
+                    userprofession: savedUser?.userprofession,
                     city: {
                         cityuuid: savedUser?.city?.cityuuid,
                         cityname: savedUser?.city?.cityname,
@@ -339,7 +353,7 @@ export class UsersService {
             existingUser.isDeleted = !existingUser.isDeleted;
             const savedUser = await this.userRepository.save(existingUser);
             const userResponse: UserStatusDto = {
-                useruuid: useruuid,
+                useruuid: savedUser.useruuid,
                 message: 'User deleted successfully',
                 statusCode: HttpStatus.OK,
             };

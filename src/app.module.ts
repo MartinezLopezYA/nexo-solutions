@@ -9,6 +9,9 @@ import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { LocationModule } from './modules/location/location.module';
 import { IdentificationTypeModule } from './modules/identification-type/identification-type.module';
+import { ClientModule } from './modules/clients/client.module';
+import { ProfessionsModule } from './modules/professions/professions.module';
+import { ProfessionsCategoryModule } from './modules/professions-category/professions-category.module';
 
 @Module({
   imports: [
@@ -27,15 +30,18 @@ import { IdentificationTypeModule } from './modules/identification-type/identifi
         password: config.get('database.password'),
         database: config.get('database.database'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),
 
     DatabaseModule,
+    ClientModule,
     UsersModule,
     RolesModule,
     PermissionsModule,
+    ProfessionsCategoryModule,
+    ProfessionsModule,
     LocationModule,
     IdentificationTypeModule,
   ],
