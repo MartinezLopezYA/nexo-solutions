@@ -18,7 +18,6 @@ export class UserCreateDto {
   @IsString()
   username: string;
 
-  @IsString()
   @IsEmail()
   useremail: string;
 
@@ -79,6 +78,10 @@ export class UserUpdateDto {
   @IsOptional()
   username?: string;
 
+  @IsEmail()
+  @IsOptional()
+  useremail?: string;
+
   @Length(10)
   @IsOptional()
   userphone?: string;
@@ -97,7 +100,7 @@ export class UserUpdateDto {
 
   @IsUUID()
   @IsOptional()
-  userprofessionuuid?: string;
+  professionuuid?: string;
 
   @IsUUID()
   @IsOptional()

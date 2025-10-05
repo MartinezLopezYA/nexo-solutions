@@ -38,6 +38,6 @@ export class PermissionInRoleDto {
 
 export class PermissionDeletedDto {
   message: string;
-  rolename: string;
+  permissionname: string;
   statusCode: string;
 }

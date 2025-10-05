@@ -6,6 +6,9 @@ import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UserWithR
 import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from '../roles/entities/role.entity';
+import { IdentificationType } from '../identification-type/entities/identification-type.entity';
+import { Profession } from '../professions/entities/profession.entity';
+import { City } from '../location/entities/city.entity';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +18,12 @@ export class UsersService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
+        @InjectRepository(IdentificationType)
+        private readonly identificationTypeRepository: Repository<IdentificationType>,
+        @InjectRepository(Profession)
+        private readonly professionRepository: Repository<Profession>,
+        @InjectRepository(City)
+        private readonly cityRepository: Repository<City>,
     ) { }
 
     async getUserByEmail(email: string): Promise<User> {
@@ -49,13 +58,7 @@ export class UsersService {
                 }
             });
 
-            if (!user) {
-                throw new NotFoundException(
-                    'User not found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+            if (!user) throw new NotFoundException('User not found', HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
 
             const userResponse = {
                 useruuid: user.useruuid,
@@ -122,13 +125,9 @@ export class UsersService {
                     },
                 }
             });
-            if (!users || users.length === 0) {
-                throw new NotFoundException(
-                    'No users found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+
+            if (!users || users.length === 0) throw new NotFoundException('No users found', HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
+
             const userResponseDto = users.map(user => ({
                 useruuid: user.useruuid,
                 firstname: user.firstname,
@@ -166,13 +165,9 @@ export class UsersService {
                     },
                 }
             });
-            if (!users || users.length === 0) {
-                throw new NotFoundException(
-                    'No active users found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+
+            if (!users || users.length === 0) throw new NotFoundException('No active users found', HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
+
             const userResponseDto = users.map(user => ({
                 useruuid: user.useruuid,
                 firstname: user.firstname,
@@ -193,23 +188,19 @@ export class UsersService {
 
     async addUser(user: UserCreateDto): Promise<UsersBasicResponseDto> {
         try {
-            const userByEmail = await this.getUserByEmail(user.useremail);
-            if (userByEmail) {
-                throw new AlreadyExistsException(
-                    'User with email ' + user.useremail + ' already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEN_USER_ERROR',
-                );
-            }
 
-            const userByIdentificationNumber = await this.getUserByIdentificationNumber(user.useridentificationnumber);
-            if (userByIdentificationNumber) {
-                throw new AlreadyExistsException(
-                    'User with identification number ' + user.useridentificationnumber + ' already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEN_USER_ERROR',
-                );
-            }
+            await this.ensureUserDoesNotExist('useremail', user.useremail, 'AEE_USER_ERROR');
+            await this.ensureUserDoesNotExist('useridentificationnumber', user.useridentificationnumber, 'AEIN_USER_ERROR');
+
+            const [identificationType, profession, city] = await Promise.all([
+                this.identificationTypeRepository.findOneBy({ identificationtypeuuid: user.identificationtypeuuid }),
+                this.professionRepository.findOneBy({ professionuuid: user.professionuuid }),
+                this.cityRepository.findOneBy({ cityuuid: user.cityuuid }),
+            ]);
+
+            if (!identificationType) throw new NotFoundException('Identification type not found', HttpStatus.NOT_FOUND, 'NF_IDENTIFICATION_TYPE_ERROR');
+            if (!profession) throw new NotFoundException('Profession not found', HttpStatus.NOT_FOUND, 'NF_PROFESSION_ERROR');
+            if (!city) throw new NotFoundException('City not found', HttpStatus.NOT_FOUND, 'NF_CITY_ERROR');
 
             const saltOrRounds = 10;
             const hashedPassword = await bcrypt.hash(user.password, saltOrRounds);
@@ -251,13 +242,7 @@ export class UsersService {
                 useruuid: useruuid,
             });
 
-            if (!existingUser) {
-                throw new NotFoundException(
-                    `User with uuid ${useruuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+            if (!existingUser) throw new NotFoundException(`User with uuid ${useruuid} not found`, HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
 
             existingUser.isActive = !existingUser.isActive;
             const savedUser = await this.userRepository.save(existingUser);
@@ -278,18 +263,25 @@ export class UsersService {
                 useruuid: useruuid,
             });
 
-            if (!existingUser) {
-                throw new NotFoundException(
-                    `User with uuid ${useruuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+            if (!existingUser) throw new NotFoundException(`User with uuid ${useruuid} not found`, HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
+
+            await this.ensureUserDoesNotExist('useremail', user.useremail, 'AEE_USER_ERROR');
+            await this.ensureUserDoesNotExist('useridentificationnumber', user.useridentificationnumber, 'AEIN_USER_ERROR');
+
+            const [identificationType, profession, city] = await Promise.all([
+                this.identificationTypeRepository.findOneBy({ identificationtypeuuid: user.identificationtypeuuid }),
+                this.professionRepository.findOneBy({ professionuuid: user.professionuuid }),
+                this.cityRepository.findOneBy({ cityuuid: user.cityuuid }),
+            ]);
+
+            if (!identificationType) throw new NotFoundException('Identification type not found', HttpStatus.NOT_FOUND, 'NF_IDENTIFICATION_TYPE_ERROR');
+            if (!profession) throw new NotFoundException('Profession not found', HttpStatus.NOT_FOUND, 'NF_PROFESSION_ERROR');
+            if (!city) throw new NotFoundException('City not found', HttpStatus.NOT_FOUND, 'NF_CITY_ERROR');
 
             const userUpdateData: DeepPartial<User> = {
                 ...user,
                 useridentificationtype: { identificationtypeuuid: user.identificationtypeuuid },
-                userprofession: { professionuuid: user.userprofessionuuid },
+                userprofession: { professionuuid: user.professionuuid },
                 city: { cityuuid: user.cityuuid },
             };
 
@@ -342,13 +334,7 @@ export class UsersService {
                 useruuid: useruuid,
             });
 
-            if (!existingUser) {
-                throw new NotFoundException(
-                    `User with uuid ${useruuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+            if (!existingUser) throw new NotFoundException(`User with uuid ${useruuid} not found`, HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
 
             existingUser.isDeleted = !existingUser.isDeleted;
             const savedUser = await this.userRepository.save(existingUser);
@@ -370,13 +356,7 @@ export class UsersService {
                 relations: ['roles'],
             });
 
-            if (!user) {
-                throw new NotFoundException(
-                    `User with uuid ${useruuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_USER_ERROR',
-                );
-            }
+            if (!user) throw new NotFoundException(`User with uuid ${useruuid} not found`, HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
 
             const idsArray = Array.isArray(roleuuids) ? roleuuids : Object.values(roleuuids);
 
@@ -384,13 +364,7 @@ export class UsersService {
                 roleuuid: In(idsArray),
             });
 
-            if (roles.length !== idsArray.length) {
-                throw new NotFoundException(
-                    `Some roles not found for user with uuid ${useruuid}`,
-                    HttpStatus.NOT_FOUND,
-                    'NFR_USER_ERROR',
-                );
-            }
+            if (roles.length !== idsArray.length) throw new NotFoundException(`Some roles not found for user with uuid ${useruuid}`, HttpStatus.NOT_FOUND, 'NFR_USER_ERROR');
 
             user.roles = roles;
             const savedUser = await this.userRepository.save(user);
@@ -414,6 +388,17 @@ export class UsersService {
             return userResponse;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while assigning roles to the user');
+        }
+    }
+
+    private async ensureUserDoesNotExist(type: 'useremail' | 'useridentificationnumber', value: string | number, code: string) {
+        const user = type === 'useremail' ? await this.getUserByEmail(value as string) : await this.getUserByIdentificationNumber(value as number);
+        if (user) {
+            throw new AlreadyExistsException(
+                'User with ' + type + ' ' + value + ' already exists',
+                HttpStatus.BAD_REQUEST,
+                code,
+            );
         }
     }
 

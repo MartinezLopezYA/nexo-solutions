@@ -39,13 +39,7 @@ export class ProfessionsCategoryService {
                 order: { professioncategoryname: 'ASC' },
             });
 
-            if (!professions || professions.length === 0) {
-                throw new NotFoundException(
-                    'No professions found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_PROFESSION_ERROR',
-                );
-            }
+            if (!professions || professions.length === 0) throw new NotFoundException('No professions found', HttpStatus.NOT_FOUND, 'NF_PROFESSION_ERROR');
 
             const professionResponseDto = professions.map(profession => ({
                 professioncategoryuuid: profession.professioncategoryuuid,
@@ -70,13 +64,7 @@ export class ProfessionsCategoryService {
                 order: { professioncategoryname: 'ASC' },
             });
 
-            if (!professions || professions.length === 0) {
-                throw new NotFoundException(
-                    'No professions found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_PROFESSION_ERROR',
-                );
-            }
+            if (!professions || professions.length === 0) throw new NotFoundException('No professions found', HttpStatus.NOT_FOUND, 'NF_PROFESSION_ERROR');
 
             const professionResponseDto = professions.map(profession => ({
                 professioncategoryuuid: profession.professioncategoryuuid,
@@ -93,32 +81,9 @@ export class ProfessionsCategoryService {
 
     async addProfessionCategory(professionCategory: ProfessionCategoryCreateDto): Promise<ProfessionCategoryResponseDto> {
         try {
-            const pcByName = await this.getProfessionCategoryByName(professionCategory.professioncategoryname);
-            if (pcByName) {
-                throw new AlreadyExistsException(
-                    'Profession category already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEN_PROFESSION_CATEGORY_ERROR',
-                );
-            }
-
-            const pcByAbbreviation = await this.getProfessionCategoryByAbbreviation(professionCategory.professioncategoryabbreviation);
-            if (pcByAbbreviation) {
-                throw new AlreadyExistsException(
-                    'Profession category abbreviation already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEA_PROFESSION_CATEGORY_ERROR',
-                );
-            }
-
-            const pcByCode = await this.getProfessionCategoryByCode(professionCategory.professioncategorycode);
-            if (pcByCode) {
-                throw new AlreadyExistsException(
-                    'Profession category code already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEC_PROFESSION_CATEGORY_ERROR',
-                );
-            }
+            await this.ensureProfessionCategoryDoesNotExist('professioncategoryname', professionCategory.professioncategoryname, 'AEN_PROFESSION_CATEGORY_ERROR');
+            await this.ensureProfessionCategoryDoesNotExist('professioncategoryabbreviation', professionCategory.professioncategoryabbreviation, 'AEA_PROFESSION_CATEGORY_ERROR');
+            await this.ensureProfessionCategoryDoesNotExist('professioncategorycode', professionCategory.professioncategorycode, 'AEC_PROFESSION_CATEGORY_ERROR');
 
             const newProfessionCategory = this.professionCategoryRepository.create(professionCategory);
             const savedProfessionCategory = await this.professionCategoryRepository.save(newProfessionCategory);
@@ -141,13 +106,7 @@ export class ProfessionsCategoryService {
                 professioncategoryuuid: professioncategoryuuid,
             });
 
-            if (!existingProfessionCategory) {
-                throw new NotFoundException(
-                    `Profession category with uuid ${professioncategoryuuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_PROFESSION_CATEGORY_ERROR',
-                );
-            }
+            if (!existingProfessionCategory) throw new NotFoundException(`Profession category with uuid ${professioncategoryuuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_CATEGORY_ERROR');
 
             existingProfessionCategory.isActive = !existingProfessionCategory.isActive;
             const savedProfessionCategory = await this.professionCategoryRepository.save(existingProfessionCategory);
@@ -164,44 +123,15 @@ export class ProfessionsCategoryService {
 
     async updateProfessionCategory(professioncategoryuuid: string, professionCategory: Partial<ProfessionCategoryUpdateDto>): Promise<ProfessionCategoryResponseDto> {
         try {
-            const pcByName = await this.getProfessionCategoryByName(professionCategory.professioncategoryname);
-            if (pcByName) {
-                throw new AlreadyExistsException(
-                    'Profession category already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEN_PROFESSION_CATEGORY_ERROR',
-                );
-            }
-
-            const pcByAbbreviation = await this.getProfessionCategoryByAbbreviation(professionCategory.professioncategoryabbreviation);
-            if (pcByAbbreviation) {
-                throw new AlreadyExistsException(
-                    'Profession category abbreviation already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEA_PROFESSION_CATEGORY_ERROR',
-                );
-            }
-
-            const pcByCode = await this.getProfessionCategoryByCode(professionCategory.professioncategorycode);
-            if (pcByCode) {
-                throw new AlreadyExistsException(
-                    'Profession category code already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEC_PROFESSION_CATEGORY_ERROR',
-                );
-            }
+            await this.ensureProfessionCategoryDoesNotExist('professioncategoryname', professionCategory.professioncategoryname, 'AEN_PROFESSION_CATEGORY_ERROR');
+            await this.ensureProfessionCategoryDoesNotExist('professioncategoryabbreviation', professionCategory.professioncategoryabbreviation, 'AEA_PROFESSION_CATEGORY_ERROR');
+            await this.ensureProfessionCategoryDoesNotExist('professioncategorycode', professionCategory.professioncategorycode, 'AEC_PROFESSION_CATEGORY_ERROR');
 
             const existingProfessionCategory = await this.professionCategoryRepository.findOneBy({
                 professioncategoryuuid: professioncategoryuuid,
             });
 
-            if (!existingProfessionCategory) {
-                throw new NotFoundException(
-                    `Profession category with uuid ${professioncategoryuuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_PROFESSION_CATEGORY_ERROR',
-                );
-            }
+            if (!existingProfessionCategory) throw new NotFoundException(`Profession category with uuid ${professioncategoryuuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_CATEGORY_ERROR');
 
             const updatedProfessionCategory = Object.assign(existingProfessionCategory, professionCategory);
             const savedProfessionCategory = await this.professionCategoryRepository.save(updatedProfessionCategory);
@@ -224,13 +154,7 @@ export class ProfessionsCategoryService {
                 professioncategoryuuid: professioncategoryuuid,
             });
 
-            if (!existingProfessionCategory) {
-                throw new NotFoundException(
-                    `Profession category with uuid ${professioncategoryuuid} not found`,
-                    HttpStatus.NOT_FOUND,
-                    'NF_PROFESSION_CATEGORY_ERROR',
-                );
-            }
+            if (!existingProfessionCategory) throw new NotFoundException(`Profession category with uuid ${professioncategoryuuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_CATEGORY_ERROR');
 
             existingProfessionCategory.isDeleted = true;
             const savedProfessionCategory = await this.professionCategoryRepository.save(existingProfessionCategory);
@@ -242,6 +166,21 @@ export class ProfessionsCategoryService {
             return professionCategoryResponse;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while deleting the profession category');
+        }
+    }
+
+    private async ensureProfessionCategoryDoesNotExist(type: 'professioncategoryname' | 'professioncategoryabbreviation' | 'professioncategorycode', value: string, code: string) {
+        const professionCategory = type === 'professioncategoryname'
+            ? await this.getProfessionCategoryByName(value as string)
+            : type === 'professioncategoryabbreviation'
+            ? await this.getProfessionCategoryByAbbreviation(value as string)
+            : await this.getProfessionCategoryByCode(value as string);
+        if (professionCategory) {
+            throw new AlreadyExistsException(
+                'Profession category with ' + type + ' ' + value + ' already exists',
+                HttpStatus.BAD_REQUEST,
+                code,
+            );
         }
     }
 

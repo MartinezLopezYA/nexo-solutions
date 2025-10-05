@@ -26,13 +26,7 @@ export class LocationService {
             const countries = await this.countryRepository.find({
                 order: { countryname: 'ASC' },
             });
-            if (!countries || countries.length === 0) {
-                throw new NotFoundException(
-                    'No countries found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_COUNTRY_ERROR',
-                );
-            }
+            if (!countries || countries.length === 0) throw new NotFoundException('No countries found', HttpStatus.NOT_FOUND, 'NF_COUNTRY_ERROR');
             const countryResponseDto = countries.map(country => ({
                 countryuuid: country.countryuuid,
                 countryname: country.countryname,
@@ -53,13 +47,9 @@ export class LocationService {
                     order: { departmentname: 'ASC' },
                 }
             );
-            if (!departments || departments.length === 0) {
-                throw new NotFoundException(
-                    'No departments found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_DEPARTMENT_ERROR',
-                );
-            }
+
+            if (!departments || departments.length === 0) throw new NotFoundException('No departments found', HttpStatus.NOT_FOUND, 'NF_DEPARTMENT_ERROR');
+
             const departmentResponseDto = departments.map(department => ({
                 departmentuuid: department.departmentuuid,
                 departmentname: department.departmentname,
@@ -78,13 +68,9 @@ export class LocationService {
                 order: { departmentname: 'ASC' },
                 where: { country: { countryuuid: countryuuid } },
             });
-            if (!departments || departments.length === 0) {
-                throw new NotFoundException(
-                    'No departments found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_DEPARTMENT_ERROR',
-                );
-            }
+
+            if (!departments || departments.length === 0) throw new NotFoundException('No departments found', HttpStatus.NOT_FOUND, 'NF_DEPARTMENT_ERROR');
+
             const departmentResponseDto = departments.map(department => ({
                 departmentuuid: department.departmentuuid,
                 departmentname: department.departmentname,
@@ -102,13 +88,9 @@ export class LocationService {
             const cities = await this.cityRepository.find({
                 order: { cityname: 'ASC' },
             });
-            if (!cities || cities.length === 0) {
-                throw new NotFoundException(
-                    'No cities found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_CITY_ERROR',
-                );
-            }
+
+            if (!cities || cities.length === 0) throw new NotFoundException('No cities found', HttpStatus.NOT_FOUND, 'NF_CITY_ERROR');
+
             const cityResponseDto = cities.map(city => ({
                 cityuuid: city.cityuuid,
                 cityname: city.cityname,
@@ -127,13 +109,9 @@ export class LocationService {
                 order: { cityname: 'ASC' },
                 where: { department: { departmentuuid: departmentuuid } },
             });
-            if (!cities || cities.length === 0) {
-                throw new NotFoundException(
-                    'No cities found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_CITY_ERROR',
-                );
-            }
+
+            if (!cities || cities.length === 0) throw new NotFoundException('No cities found', HttpStatus.NOT_FOUND, 'NF_CITY_ERROR');
+
             const cityResponseDto = cities.map(city => ({
                 cityuuid: city.cityuuid,
                 cityname: city.cityname,

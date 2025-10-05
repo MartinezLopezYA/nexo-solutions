@@ -17,13 +17,8 @@ export class IdentificationTypeService {
             const identificationTypes = await this.identificationTypeRepository.find({
                 order: { identificationtypename: 'ASC' },
             });
-            if (!identificationTypes || identificationTypes.length === 0) {
-                throw new NotFoundException(
-                    'No identification types found',
-                    HttpStatus.NOT_FOUND,
-                    'NF_IDENTIFICATION_TYPE_ERROR',
-                );
-            }
+
+            if (!identificationTypes || identificationTypes.length === 0) throw new NotFoundException('No identification types found', HttpStatus.NOT_FOUND, 'NF_IDENTIFICATION_TYPE_ERROR');
 
             const identificationTypeResponseDto = identificationTypes.map(identificationType => ({
                 identificationtypeuuid: identificationType.identificationtypeuuid,
@@ -34,17 +29,17 @@ export class IdentificationTypeService {
 
             return identificationTypeResponseDto;
         } catch (error) {
-            this.handleInternalError(error, 'An error occurred while updating the identification type');
+            this.handleInternalError(error, 'An error occurred while getting all identification types');
         }
     }
 
-    async findByName(identificationtypename: string): Promise<IdentificationType> {
+    async getIdentiTypeByName(identificationtypename: string): Promise<IdentificationType> {
         return await this.identificationTypeRepository.findOneBy({
             identificationtypename: identificationtypename,
         });
     }
 
-    async findByCode(identificationtypecode: string): Promise<IdentificationType> {
+    async getIdentiTypeByCode(identificationtypecode: string): Promise<IdentificationType> {
         return await this.identificationTypeRepository.findOneBy({
             identificationtypecode: identificationtypecode,
         });
@@ -52,22 +47,9 @@ export class IdentificationTypeService {
 
     async addIdentificationType(identificationType: CreateIdentificationTypeDto): Promise<IdentificationTypeResponseDto> {
         try {
-            const existName = await this.findByName(identificationType.identificationtypename);
-            if (existName) {
-                throw new AlreadyExistsException(
-                    'Identification type with name ' + identificationType.identificationtypename + ' already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEN_IDENTIFICATION_TYPE_ERROR',
-                );
-            }
-            const existCode = await this.findByCode(identificationType.identificationtypecode);
-            if (existCode) {
-                throw new AlreadyExistsException(
-                    'Identification type with code ' + identificationType.identificationtypecode + ' already exists',
-                    HttpStatus.BAD_REQUEST,
-                    'AEC_IDENTIFICATION_TYPE_ERROR',
-                );
-            }
+
+            await this.ensureIdentificationTypeDoesNotExist('identificationtypename', identificationType.identificationtypename, 'AEN_IDENTIFICATION_TYPE_ERROR');
+            await this.ensureIdentificationTypeDoesNotExist('identificationtypecode', identificationType.identificationtypecode, 'AEC_IDENTIFICATION_TYPE_ERROR');
 
             const newIdentificationType = this.identificationTypeRepository.create(identificationType);
             const savedIdentificationType = await this.identificationTypeRepository.save(newIdentificationType);
@@ -80,6 +62,17 @@ export class IdentificationTypeService {
             return identificationTypeResponseDto;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while updating the identification type');
+        }
+    }
+
+    private async ensureIdentificationTypeDoesNotExist(type: 'identificationtypename' | 'identificationtypecode', value: string, code: string) {
+        const IdentificationType = type === 'identificationtypename' ? await this.getIdentiTypeByName(value as string) : await this.getIdentiTypeByCode(value as string);
+        if (IdentificationType) {
+            throw new AlreadyExistsException(
+                'Identification type with ' + type + ' ' + value + ' already exists',
+                HttpStatus.BAD_REQUEST,
+                code,
+            );
         }
     }
 

@@ -21,13 +21,7 @@ export class RolesService {
         order: { rolename: 'ASC' },
       });
 
-      if (!roles || roles.length === 0) {
-        throw new NotFoundException(
-          'No roles found',
-          HttpStatus.NOT_FOUND,
-          'NF_ROLE_ERROR',
-        );
-      }
+      if (!roles || roles.length === 0) throw new NotFoundException('No roles found', HttpStatus.NOT_FOUND, 'NF_ROLE_ERROR');
 
       const roleResponseDto = roles.map(role => ({
         roleuuid: role.roleuuid,
@@ -50,13 +44,8 @@ export class RolesService {
         order: { rolename: 'ASC' },
       });
 
-      if (!roles || roles.length === 0) {
-        throw new NotFoundException(
-          'No active roles found',
-          HttpStatus.NOT_FOUND,
-          'NFA_ROLE_ERROR',
-        );
-      }
+      if (!roles || roles.length === 0) throw new NotFoundException('No active roles found', HttpStatus.NOT_FOUND, 'NFA_ROLE_ERROR');
+
       const roleResponseDto = roles.map(role => ({
         roleuuid: role.roleuuid,
         rolename: role.rolename,
@@ -78,13 +67,7 @@ export class RolesService {
         relations: ['permissions'],
       });
 
-      if (!role) {
-        throw new NotFoundException(
-          `Role with ID ${roleuuid} not found`,
-          HttpStatus.NOT_FOUND,
-          'NF_ROLE_WITH_PERMISSIONS_ERROR',
-        );
-      }
+      if (!role) throw new NotFoundException(`Role with ID ${roleuuid} not found`, HttpStatus.NOT_FOUND, 'NF_ROLE_WITH_PERMISSIONS_ERROR');
 
       const roleWithPermissions: RoleWithPermissionsDto = {
         roleuuid: role.roleuuid,
@@ -105,13 +88,13 @@ export class RolesService {
     }
   }
 
-  async findByName(rolename: string): Promise<Role> {
+  async getClientByName(rolename: string): Promise<Role> {
     return await this.roleRepository.findOneBy({
       rolename: rolename,
     });
   }
 
-  async findByCode(rolecode: string): Promise<Role> {
+  async getClientByCode(rolecode: string): Promise<Role> {
     return await this.roleRepository.findOneBy({
       rolecode: rolecode,
     });
@@ -119,23 +102,10 @@ export class RolesService {
 
   async addRole(role: CreateRoleDto): Promise<RoleResponseDto> {
     try {
-      const existName = await this.findByName(role.rolename);
-      if (existName) {
-        throw new AlreadyExistsException(
-          'Role with name ' + role.rolename + ' already exists',
-          HttpStatus.BAD_REQUEST,
-          'AEN_ROLE_ERROR',
-        );
-      }
 
-      const existCode = await this.findByCode(role.rolecode);
-      if (existCode) {
-        throw new AlreadyExistsException(
-          'Role with code ' + role.rolecode + ' already exists',
-          HttpStatus.BAD_REQUEST,
-          'AEC_ROLE_ERROR',
-        );
-      }
+      await this.ensureClientDoesNotExist('rolename', role.rolename, 'AEN_ROLE_ERROR');
+      await this.ensureClientDoesNotExist('rolecode', role.rolecode, 'AEC_ROLE_ERROR');
+
       const newRole = this.roleRepository.create(role);
       const savedRole = await this.roleRepository.save(newRole);
       const roleResponse: RoleResponseDto = {
@@ -157,13 +127,10 @@ export class RolesService {
         roleuuid: roleuuid,
       });
 
-      if (!existingRole) {
-        throw new NotFoundException(
-          `Role with uuid ${roleuuid} not found`,
-          HttpStatus.NOT_FOUND,
-          'NF_ROLE_ERROR',
-        );
-      }
+      if (!existingRole) throw new NotFoundException(`Role with uuid ${roleuuid} not found`, HttpStatus.NOT_FOUND, 'NF_ROLE_ERROR');
+
+      await this.ensureClientDoesNotExist('rolename', role.rolename, 'AEN_ROLE_ERROR');
+      await this.ensureClientDoesNotExist('rolecode', role.rolecode, 'AEC_ROLE_ERROR');
 
       const updatedRole = Object.assign(existingRole, role);
       const savedRole = await this.roleRepository.save(updatedRole);
@@ -186,13 +153,7 @@ export class RolesService {
         roleuuid: roleuuid,
       });
 
-      if (!existingRole) {
-        throw new NotFoundException(
-          `Role with uuid ${roleuuid} not found`,
-          HttpStatus.NOT_FOUND,
-          'NF_ROLE_ERROR',
-        );
-      }
+      if (!existingRole) throw new NotFoundException(`Role with uuid ${roleuuid} not found`, HttpStatus.NOT_FOUND, 'NF_ROLE_ERROR');
 
       existingRole.isActive = !existingRole.isActive;
       const savedRole = await this.roleRepository.save(existingRole);
@@ -215,13 +176,7 @@ export class RolesService {
         roleuuid: roleuuid,
       });
 
-      if (!existingRole) {
-        throw new NotFoundException(
-          `Role with uuid ${roleuuid} not found`,
-          HttpStatus.NOT_FOUND,
-          'NF_ROLE_ERROR',
-        );
-      }
+      if (!existingRole) throw new NotFoundException(`Role with uuid ${roleuuid} not found`, HttpStatus.NOT_FOUND, 'NF_ROLE_ERROR');
 
       await this.roleRepository.remove(existingRole);
       return {
@@ -241,13 +196,7 @@ export class RolesService {
         relations: ['permissions'],
       });
 
-      if (!role) {
-        throw new NotFoundException(
-          `Role with uuid ${roleuuid} not found`,
-          HttpStatus.NOT_FOUND,
-          'NF_ROLE_ERROR',
-        );
-      }
+      if (!role) throw new NotFoundException(`Role with uuid ${roleuuid} not found`, HttpStatus.NOT_FOUND, 'NF_ROLE_ERROR');
 
       const idsArray = Array.isArray(permissionuuids) ? permissionuuids : Object.values(permissionuuids);
 
@@ -255,13 +204,7 @@ export class RolesService {
         where: { permissionuuid: In(idsArray) },
       });
 
-      if (permissions.length !== idsArray.length) {
-        throw new NotFoundException(
-          `Some permissions not found for role with uuid ${roleuuid}`,
-          HttpStatus.NOT_FOUND,
-          'NFP_ROLE_ERROR',
-        );
-      }
+      if (permissions.length !== idsArray.length) throw new NotFoundException(`Some permissions not found for role with uuid ${roleuuid}`, HttpStatus.NOT_FOUND, 'NFP_ROLE_ERROR');
 
       role.permissions = permissions;
       const savedPermissionRole = await this.roleRepository.save(role);
@@ -281,6 +224,17 @@ export class RolesService {
       return roleResponse;
     } catch (error) {
       this.handleInternalError(error, 'An error occurred while assigning permissions to the role');
+    }
+  }
+
+  private async ensureClientDoesNotExist(type: 'rolename' | 'rolecode', value: string, code: string) {
+    const role = type === 'rolename' ? await this.getClientByName(value as string) : await this.getClientByCode(value as string);
+    if (role) {
+      throw new AlreadyExistsException(
+        'Role with ' + type + ' ' + value + ' already exists',
+        HttpStatus.BAD_REQUEST,
+        code,
+      );
     }
   }
 
