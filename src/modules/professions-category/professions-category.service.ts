@@ -1,15 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ProfessionCategory } from './entities/profession-category.entity';
-import { ProfessionCategoryCreateDto, ProfessionCategoryResponseDto, ProfessionCategoryStatusDto, ProfessionCategoryUpdateDto } from './dto/profession-category.dto';
+import { CategoryWithProfessionDto, ProfessionCategoryCreateDto, ProfessionCategoryResponseDto, ProfessionCategoryStatusDto, ProfessionCategoryUpdateDto } from './dto/profession-category.dto';
 import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
+import { Profession } from '../professions/entities/profession.entity';
 
 @Injectable()
 export class ProfessionsCategoryService {
     constructor(
         @InjectRepository(ProfessionCategory)
         private readonly professionCategoryRepository: Repository<ProfessionCategory>,
+        @InjectRepository(Profession)
+        private readonly professionRepository: Repository<Profession>,
     ) { }
 
     async getProfessionCategoryByAbbreviation(abbreviation: string): Promise<ProfessionCategory> {
@@ -28,6 +31,29 @@ export class ProfessionsCategoryService {
         return await this.professionCategoryRepository.findOneBy({
             professioncategoryname: name
         });
+    }
+
+    async getProfessionCategoryByUuid(uuid: string): Promise<CategoryWithProfessionDto> {
+        try {
+            const professionCategory = await this.professionCategoryRepository.findOne({
+                where: { professioncategoryuuid: uuid},
+                relations: ['professions'],
+            });
+
+            if (!professionCategory) throw new NotFoundException(`Profession category with uuid ${uuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_CATEGORY_ERROR');
+
+            const professionResponseDto = {
+                professioncategoryuuid: professionCategory.professioncategoryuuid,
+                professioncategoryname: professionCategory.professioncategoryname,
+                professions: professionCategory.professions.filter((profession) => profession.isActive).map(profession => ({
+                    professionuuid: profession.professionuuid,
+                    professionname: profession.professionname,
+                })) || [],
+            } as CategoryWithProfessionDto;
+            return professionResponseDto;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while getting the profession category by uuid');
+        }
     }
 
     async getAllProfessionsCategories(): Promise<ProfessionCategoryResponseDto[]> {
@@ -166,6 +192,39 @@ export class ProfessionsCategoryService {
             return professionCategoryResponse;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while deleting the profession category');
+        }
+    }
+
+    async assignProfessionsToCategory(categoryuuid: string, professionsuuids: string[]): Promise<CategoryWithProfessionDto> {
+        try {
+            const category = await this.professionCategoryRepository.findOne({
+                where: { professioncategoryuuid: categoryuuid },
+                relations: ['professions'],
+            });
+
+            if (!category) throw new NotFoundException(`Profession category with uuid ${categoryuuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_CATEGORY_ERROR');
+
+            const idsArray = Array.isArray(professionsuuids) ? professionsuuids : Object.values(professionsuuids);
+
+            const professions = await this.professionRepository.find({
+                where: { professionuuid: In(idsArray) },
+            });
+
+            if (professions.length !== idsArray.length) throw new NotFoundException(`Some professions not found for category with uuid ${categoryuuid}`, HttpStatus.NOT_FOUND, 'NFP_PROFESSION_CATEGORY_ERROR');
+
+            category.professions = professions;
+            const savedProfessionCategory = await this.professionCategoryRepository.save(category);
+            const categoryResponse: CategoryWithProfessionDto = {
+                professioncategoryuuid: savedProfessionCategory.professioncategoryuuid,
+                professioncategoryname: savedProfessionCategory.professioncategoryname,
+                professions: savedProfessionCategory.professions.map(profession => ({
+                    professionuuid: profession.professionuuid,
+                    professionname: profession.professionname
+                })),
+            }
+            return categoryResponse;
+        } catch (error) {
+            this.handleInternalError(error, 'An error occurred while assigning professions to the category');
         }
     }
 

@@ -1,5 +1,5 @@
 import { ProfessionCategory } from "../../professions-category/entities/profession-category.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('professions')
 export class Profession {
@@ -30,6 +30,6 @@ export class Profession {
     @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @ManyToOne(() => ProfessionCategory, (professionsCategory) => professionsCategory.professions)
+    @ManyToMany(() => ProfessionCategory, (professionsCategory) => professionsCategory.professions)
     professioncategory: ProfessionCategory;
 }

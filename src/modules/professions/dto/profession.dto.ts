@@ -53,8 +53,19 @@ export class ProfessionResponseDto {
     isActive: boolean;
 }
 
-export class ProfessionInCategory {
+export class ProfessionInCategoryDto {
+    professionuuid: string;
+    professionname: string;
+}
+
+export class ProfessionWithCategoriesDto {
     professionuuid: string;
     professionname: string;
     professioncategory: CategoryInProfessionDto;
+}
+
+export class ProfessionStatusDto {
+    professionuuid: string;
+    message: string;
+    statusCode: number;
 }

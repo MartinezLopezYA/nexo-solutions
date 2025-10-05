@@ -4,7 +4,7 @@ import { CityWithDepartmentAndCountryDto } from 'src/modules/location/dto/city.d
 import { RoleInUser } from 'src/modules/roles/dto/role.dto';
 import { Transform, Type } from 'class-transformer';
 import { capitalize, capitalizeFirstLetter } from 'src/common/utils/format';
-import { ProfessionInCategory } from 'src/modules/professions/dto/profession.dto';
+import { ProfessionWithCategoriesDto } from 'src/modules/professions/dto/profession.dto';
 
 export class UserCreateDto {
   @IsString()
@@ -124,7 +124,7 @@ export class UsersBasicResponseDto {
   username: string;
   useremail: string;
   userphone: string;
-  userprofession: ProfessionInCategory;
+  userprofession: ProfessionWithCategoriesDto;
   useridentificationtype: IdentificationTypeToUserDto;
   useridentificationnumber: number;
   isActive: boolean;
@@ -144,7 +144,7 @@ export class UserResponseDto {
 
 export class UserAditionalResponseDto {
   usergender?: string;
-  userprofession?: ProfessionInCategory;
+  userprofession?: ProfessionWithCategoriesDto;
   city?: CityWithDepartmentAndCountryDto;
   useraddress?: string;
   dateOfBirth?: Date;

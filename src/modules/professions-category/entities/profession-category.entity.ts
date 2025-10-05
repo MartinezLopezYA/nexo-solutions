@@ -1,5 +1,5 @@
 import { Profession } from "../../professions/entities/profession.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('professions-category')
 export class ProfessionCategory {
@@ -9,7 +9,7 @@ export class ProfessionCategory {
     @Column({ nullable: false, length: 50, unique: true })
     professioncategoryname: string;
 
-    @Column({nullable: true, unique: true, length: 10})
+    @Column({ nullable: true, unique: true, length: 10 })
     professioncategoryabbreviation: string;
 
     @Column({ nullable: true, length: 10, unique: true })
@@ -27,6 +27,9 @@ export class ProfessionCategory {
     @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @OneToMany(() => Profession, (profession) => profession.professioncategory, {nullable: true})
+    @ManyToMany(() => Profession, (profession) => profession.professioncategory, {
+        cascade: true,
+    })
+    @JoinTable({ name: 'category-professions' })
     professions: Profession[];
 }

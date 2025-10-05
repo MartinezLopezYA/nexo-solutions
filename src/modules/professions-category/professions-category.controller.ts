@@ -2,13 +2,28 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseInterceptors } fr
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/undefined-to-null-interceptor.interceptor';
 import { ProfessionsCategoryService } from './professions-category.service';
-import { ProfessionCategoryCreateDto, ProfessionCategoryResponseDto, ProfessionCategoryStatusDto, ProfessionCategoryUpdateDto } from './dto/profession-category.dto';
+import { CategoryWithProfessionDto, ProfessionCategoryCreateDto, ProfessionCategoryResponseDto, ProfessionCategoryStatusDto, ProfessionCategoryUpdateDto } from './dto/profession-category.dto';
 
 @ApiTags('Professions Category')
 @UseInterceptors(UndefinedToNullInterceptorInterceptor)
 @Controller('professions-category')
 export class ProfessionsCategoryController {
     constructor(private readonly professionsCategoryService: ProfessionsCategoryService) { }
+
+    @Get('v1/:professioncategoryuuid')
+    @ApiOperation({
+        summary: 'Get profession category by uuid',
+        description: 'This endpoint returns a profession category by uuid.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Profession category found',
+        type: CategoryWithProfessionDto,
+    })
+    @ApiResponse({ status: 404, description: 'Profession category not found' })
+    async getProfessionCategoryByUuid(@Param('professioncategoryuuid') professioncategoryuuid: string): Promise<CategoryWithProfessionDto> {
+        return this.professionsCategoryService.getProfessionCategoryByUuid(professioncategoryuuid);
+    }
 
     @Get('v1')
     @ApiOperation({
@@ -105,6 +120,24 @@ export class ProfessionsCategoryController {
         @Param('professioncategoryuuid') professioncategoryuuid: string
     ): Promise<ProfessionCategoryStatusDto> {
         return this.professionsCategoryService.removeProfessionCategory(professioncategoryuuid);
+    }
+
+    @Post('v1/:professioncategoryuuid/assign-professions')
+    @ApiOperation({
+        summary: 'Assign professions to a profession category',
+        description: 'This endpoint assigns professions to a profession category.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Professions assigned successfully',
+        type: CategoryWithProfessionDto,
+    })
+    @ApiResponse({ status: 404, description: 'Profession category not found' })
+    async assignProfessionsToCategory(
+        @Param('professioncategoryuuid') professioncategoryuuid: string,
+        @Body() professionsuuids: string[],
+    ): Promise<CategoryWithProfessionDto> {
+        return this.professionsCategoryService.assignProfessionsToCategory(professioncategoryuuid, professionsuuids);
     }
 
 }

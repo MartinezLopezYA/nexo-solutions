@@ -116,7 +116,7 @@ export class RolesController {
     return this.rolesService.deleteRole(roleuuid);
   }
 
-  @Post('v1/:roleuuid/permissions')
+  @Post('v1/:roleuuid/assign-permissions')
   @ApiOperation({
     summary: 'Assign permissions to a role',
     description: 'This endpoint allows you to assign permissions to a role.',

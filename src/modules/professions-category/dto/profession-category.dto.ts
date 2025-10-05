@@ -1,7 +1,7 @@
 import { Transform } from "class-transformer";
 import { IsString } from "class-validator";
 import { capitalize, capitalizeFirstLetter } from "src/common/utils/format";
-import { ProfessionInCategory } from "src/modules/professions/dto/profession.dto";
+import { ProfessionInCategoryDto } from "src/modules/professions/dto/profession.dto";
 
 export class ProfessionCategoryCreateDto {
     @IsString()
@@ -48,7 +48,7 @@ export class ProfessionCategoryInCategoryResponseDto {
 export class CategoryWithProfessionDto {
     professioncategoryuuid: string;
     professioncategoryname: string;
-    professions: ProfessionInCategory[] | null;
+    professions: ProfessionInCategoryDto[] | null;
 }
 
 export class CategoryInProfessionDto {
