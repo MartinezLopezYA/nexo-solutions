@@ -1,26 +1,36 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { capitalizeFirstLetter } from 'src/common/utils/format';
 import { PermissionInRoleDto } from 'src/modules/permissions/dto/permission.dto';
+import { Transform } from 'class-transformer';
 
 export class CreateRoleDto {
   @IsString()
-  rolename: string = 'Administrador';
+  @IsNotEmpty()
+  @Transform(({ value }) => capitalizeFirstLetter(value))
+  rolename: string;
 
   @IsString()
-  roledesc?: string = 'Rol con todos los permisos';
+  @IsOptional()
+  roledesc?: string;
 
   @IsString()
-  rolecode?: string = 'ADMIN';
+  @IsOptional()
+  rolecode?: string;
 }
 
 export class UpdateRoleDto {
   @IsString()
-  rolename?: string = 'Usuario';
+  @IsOptional()
+  @Transform(({ value }) => capitalizeFirstLetter(value))
+  rolename?: string;
 
   @IsString()
-  roledesc?: string = 'Rol con permisos limitados';
+  @IsOptional()
+  roledesc?: string;
 
   @IsString()
-  rolecode?: string = 'USER';
+  @IsOptional()
+  rolecode?: string;
 }
 
 export class RoleResponseDto {

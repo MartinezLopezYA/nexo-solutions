@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, IsUUID, Length, Matches, MinLength, IsOptional } from 'class-validator';
+import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, IsUUID, Length, Matches, MinLength, IsOptional, IsNotEmpty } from 'class-validator';
 import { IdentificationTypeToUserDto } from 'src/modules/identification-type/dto/identification-type.dto';
 import { CityWithDepartmentAndCountryDto } from 'src/modules/location/dto/city.dto';
 import { RoleInUser } from 'src/modules/roles/dto/role.dto';
@@ -8,17 +8,22 @@ import { ProfessionWithCategoriesDto } from 'src/modules/professions/dto/profess
 
 export class UserCreateDto {
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => capitalizeFirstLetter(value))
   firstname: string;
 
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => capitalizeFirstLetter(value))
   lastname: string;
 
   @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => capitalize(value))
   username: string;
 
   @IsEmail()
+  @IsNotEmpty()
   useremail: string;
 
   @IsString()
@@ -31,9 +36,11 @@ export class UserCreateDto {
   userphone: string;
 
   @IsUUID()
+  @IsNotEmpty()
   identificationtypeuuid: string;
 
   @IsNumber()
+  @IsNotEmpty()
   useridentificationnumber: number;
 
   @IsString()
@@ -76,6 +83,7 @@ export class UserUpdateDto {
 
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => capitalize(value))
   username?: string;
 
   @IsEmail()

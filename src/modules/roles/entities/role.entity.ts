@@ -1,5 +1,6 @@
 import { Permission } from '../../permissions/entities/permission.entity';
 import { User } from '../../users/entities/user.entity';
+import { Worker } from '../../workers/entities/worker.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('roles')
@@ -27,6 +28,9 @@ export class Role {
 
   @ManyToMany(() => User, (user) => user.roles)
   users: User[];
+
+  @ManyToMany(() => Worker, (worker) => worker.roles)
+  workers: Worker[];
 
   @ManyToMany(() => Permission, (permission) => permission.roles, {
     cascade: true,

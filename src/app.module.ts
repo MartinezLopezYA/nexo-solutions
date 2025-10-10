@@ -9,9 +9,10 @@ import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { LocationModule } from './modules/location/location.module';
 import { IdentificationTypeModule } from './modules/identification-type/identification-type.module';
-import { ClientModule } from './modules/clients/client.module';
+import { ClientsModule } from './modules/clients/clients.module';
 import { ProfessionsModule } from './modules/professions/professions.module';
 import { ProfessionsCategoryModule } from './modules/professions-category/professions-category.module';
+import { WorkersModule } from './modules/workers/workers.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { ProfessionsCategoryModule } from './modules/professions-category/profes
     }),
 
     DatabaseModule,
-    ClientModule,
+    ClientsModule,
+    WorkersModule,
     UsersModule,
     RolesModule,
     PermissionsModule,

@@ -1,8 +1,7 @@
-
 import { TypeClientEnum } from '../../clients/enums/client.enum';
 import { IdentificationType } from '../../identification-type/entities/identification-type.entity';
 import { City } from '../../location/entities/city.entity';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity('clients')
 export class Client {
@@ -40,15 +39,6 @@ export class Client {
 
     @Column({ nullable: false, length: 80, unique: true })
     clientaddress: string;
-
-    @Column({ nullable: false, length: 100 })
-    clientowner: string;
-
-    @Column({ nullable: true, length: 10 })
-    clientownerphone: string;
-
-    @Column({ nullable: true, length: 80 })
-    clientowneremail: string;
 
     @Column({ nullable: true, type: 'boolean', default: true })
     isActive: boolean;
