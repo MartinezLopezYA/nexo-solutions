@@ -14,16 +14,16 @@ export class Worker {
     @Column({ nullable: false, length: 50 })
     workerlastname: string;
 
-    @Column({ unique: false, nullable: false, length: 50 })
+    @Column({ unique: true, nullable: false, length: 50 })
     workerusername: string;
 
-    @Column({ nullable: false, length: 100 })
+    @Column({ nullable: false, length: 100, unique: true })
     workeremail: string;
 
     @Column({ nullable: false })
     workerpassword: string;
 
-    @Column({ nullable: false, length: 15 })
+    @Column({ nullable: false, length: 15, unique: true })
     workerphone: string;
 
     @Column({ nullable: false, unique: true })

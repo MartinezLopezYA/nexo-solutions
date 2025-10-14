@@ -25,3 +25,15 @@ export class AlreadyExistsException extends HttpException {
     );
   }
 }
+export class UnauthorizedException extends HttpException {
+  constructor(message: string, status: HttpStatus, errorCode: string) {
+    super(
+      {
+        statusCode: status,
+        errorCode,
+        message,
+      },
+      status,
+    );
+  }
+}

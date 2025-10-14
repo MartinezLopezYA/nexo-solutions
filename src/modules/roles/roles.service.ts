@@ -5,6 +5,7 @@ import { In, Repository } from 'typeorm';
 import { CreateRoleDto, RoleDeletedDto, RoleResponseDto, RoleWithPermissionsDto, UpdateRoleDto } from './dto/role.dto';
 import { Permission } from '../permissions/entities/permission.entity';
 import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
+import { InternalException } from 'src/common/exceptions/internal-exception';
 
 @Injectable()
 export class RolesService {
@@ -33,7 +34,7 @@ export class RolesService {
 
       return roleResponseDto;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while updating the role');
+      throw new InternalException('An error occurred while updating the role');
     }
   }
 
@@ -56,7 +57,7 @@ export class RolesService {
 
       return roleResponseDto;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while updating the role');
+      throw new InternalException('An error occurred while updating the role');
     }
   }
 
@@ -84,7 +85,7 @@ export class RolesService {
 
       return roleWithPermissions;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while retrieving the role with permissions');
+      throw new InternalException('An error occurred while retrieving the role with permissions');
     }
   }
 
@@ -117,7 +118,7 @@ export class RolesService {
       };
       return roleResponse;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while adding the role');
+      throw new InternalException('An error occurred while adding the role');
     }
   }
 
@@ -143,7 +144,7 @@ export class RolesService {
       };
       return roleResponse;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while updating the role');
+      throw new InternalException('An error occurred while updating the role');
     }
   }
 
@@ -166,7 +167,7 @@ export class RolesService {
       };
       return roleResponse;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while updating the role status');
+      throw new InternalException('An error occurred while updating the role status');
     }
   }
 
@@ -185,7 +186,7 @@ export class RolesService {
         statusCode: 'SUCCESS',
       }
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while deleting the role');
+      throw new InternalException('An error occurred while deleting the role');
     }
   }
 
@@ -223,7 +224,7 @@ export class RolesService {
 
       return roleResponse;
     } catch (error) {
-      this.handleInternalError(error, 'An error occurred while assigning permissions to the role');
+      throw new InternalException('An error occurred while assigning permissions to the role');
     }
   }
 
@@ -238,17 +239,4 @@ export class RolesService {
     }
   }
 
-  private handleInternalError(error: unknown, message: string): never {
-    if (error instanceof HttpException) {
-      throw error;
-    }
-    throw new HttpException(
-      {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        errorCode: 'INTERNAL_SERVER_ERROR',
-        message,
-      },
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
-  }
 }

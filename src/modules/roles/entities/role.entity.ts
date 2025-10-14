@@ -20,6 +20,9 @@ export class Role {
   @Column({ nullable: false, type: 'boolean', default: true })
   isActive: boolean;
 
+  @Column({ nullable: false, type: 'boolean', default: false })
+  isDeleted: boolean;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

@@ -13,6 +13,7 @@ import { ClientsModule } from './modules/clients/clients.module';
 import { ProfessionsModule } from './modules/professions/professions.module';
 import { ProfessionsCategoryModule } from './modules/professions-category/professions-category.module';
 import { WorkersModule } from './modules/workers/workers.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { WorkersModule } from './modules/workers/workers.module';
     }),
 
     DatabaseModule,
+    AuthModule,
     ClientsModule,
     WorkersModule,
     UsersModule,

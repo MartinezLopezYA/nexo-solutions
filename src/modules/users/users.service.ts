@@ -26,9 +26,21 @@ export class UsersService {
         private readonly cityRepository: Repository<City>,
     ) { }
 
-    async getUserByEmail(email: string): Promise<User> {
+    async getUserByUsername(username: string): Promise<User> {
         return await this.userRepository.findOneBy({
-            useremail: email
+            username: username
+        });
+    }
+
+    async getUserByEmail(useremail: string): Promise<User> {
+        return await this.userRepository.findOneBy({
+            useremail: useremail
+        });
+    }
+
+    async getUserByPhone(userphone: string): Promise<User> {
+        return await this.userRepository.findOneBy({
+            userphone: userphone
         });
     }
 
@@ -207,7 +219,7 @@ export class UsersService {
 
             const newUserData: DeepPartial<User> = {
                 ...user,
-                password: hashedPassword,
+                userpassword: hashedPassword,
                 useridentificationtype: { identificationtypeuuid: user.identificationtypeuuid },
                 userprofession: { professionuuid: user.professionuuid },
                 city: { cityuuid: user.cityuuid },
@@ -223,10 +235,7 @@ export class UsersService {
                 useremail: savedUser.useremail,
                 userphone: savedUser.userphone,
                 userprofession: savedUser?.userprofession,
-                useridentificationtype: {
-                    identificationtypeuuid: savedUser.useridentificationtype.identificationtypeuuid,
-                    identificationtypename: savedUser.useridentificationtype.identificationtypename,
-                },
+                useridentificationtype: savedUser.useridentificationtype,
                 useridentificationnumber: savedUser.useridentificationnumber,
                 isActive: savedUser.isActive
             }

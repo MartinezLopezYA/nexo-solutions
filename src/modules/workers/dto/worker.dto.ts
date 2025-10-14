@@ -1,5 +1,5 @@
 import { Transform} from "class-transformer";
-import { IsString, IsEmail, MinLength, Matches, Length, IsNumber, IsOptional, IsBoolean, IsNotEmpty } from "class-validator";
+import { IsString, IsEmail, MinLength, Matches, Length, IsNumber, IsOptional, IsNotEmpty } from "class-validator";
 import { capitalize, capitalizeFirstLetter} from "src/common/utils/format";
 import { RoleInUser } from "src/modules/roles/dto/role.dto";
 
@@ -36,6 +36,10 @@ export class WorkerCreateDto {
     @IsNumber()
     @IsNotEmpty()
     workeridentificationnumber: number;
+
+    @IsString()
+    @IsNotEmpty()
+    clientuuid: string;
 }
 
 export class WorkerUpdateDto {
@@ -75,6 +79,7 @@ export class WorkerResponseDto {
     workeremail: string;
     workerphone?: string;
     workeridentificationnumber?: number;
+    isActive: boolean;
     roles: RoleInUser[] | [];
 }
 

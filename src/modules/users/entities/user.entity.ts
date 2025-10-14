@@ -16,16 +16,16 @@ export class User {
   @Column({ nullable: false, length: 50 })
   lastname: string;
 
-  @Column({ unique: false, nullable: false, length: 50 })
+  @Column({ unique: true, nullable: false, length: 50 })
   username: string;
 
-  @Column({ nullable: false, length: 100 })
+  @Column({ nullable: false, length: 100, unique: true })
   useremail: string;
 
   @Column({ nullable: false })
   userpassword: string;
 
-  @Column({ nullable: false, length: 15 })
+  @Column({ nullable: false, length: 15, unique: true })
   userphone: string;
 
   @ManyToOne(() => IdentificationType)

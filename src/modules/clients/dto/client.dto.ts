@@ -4,6 +4,7 @@ import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Le
 import { capitalize, capitalizeFirstLetter } from "src/common/utils/format";
 import { IdentificationTypeToUserDto } from "src/modules/identification-type/dto/identification-type.dto";
 import { CityWithDepartmentAndCountryDto } from "src/modules/location/dto/city.dto";
+import { WorkerResponseDto } from "src/modules/workers/dto/worker.dto";
 
 export class ClientCreateDto {
     @IsEnum(TypeClientEnum)
@@ -46,7 +47,7 @@ export class ClientCreateDto {
 
     @IsString()
     @IsNotEmpty()
-    city: string;
+    cityuuid: string;
 
     @IsString()
     @IsNotEmpty()
@@ -97,7 +98,7 @@ export class ClientUpdateDto {
 
     @IsString()
     @IsOptional()
-    city?: string;
+    cityuuid?: string;
 
     @IsString()
     @IsOptional()
@@ -121,6 +122,24 @@ export class ClientResponseDto {
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export class ClientWithWorkersDto {
+    clientuuid: string;
+    clienttype: TypeClientEnum;
+    clientidentificationtype: IdentificationTypeToUserDto;
+    clientidentificationnumber: number;
+    clientverificationnumber: number;
+    clientname: string;
+    clientcode: string;
+    clientemail: string;
+    clientphone: string;
+    city: CityWithDepartmentAndCountryDto;
+    clientaddress: string;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    workers: WorkerResponseDto[];
 }
 
 export class ClientStatusDto {

@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Patch, Post, Delete, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Delete, UseInterceptors, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UserWithRolesDto, UsersBasicResponseDto } from './dto/user.dto';
 import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/undefined-to-null-interceptor.interceptor';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @ApiTags('Users')
 @UseInterceptors(UndefinedToNullInterceptorInterceptor)
@@ -10,6 +11,7 @@ import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/u
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    @UseGuards(JwtAuthGuard)
     @Get('v1')
     @ApiOperation({
         summary: 'Get all users',

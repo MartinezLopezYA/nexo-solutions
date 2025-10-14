@@ -2,6 +2,7 @@ import { TypeClientEnum } from '../../clients/enums/client.enum';
 import { IdentificationType } from '../../identification-type/entities/identification-type.entity';
 import { City } from '../../location/entities/city.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Worker } from '../../workers/entities/worker.entity';
 
 @Entity('clients')
 export class Client {
@@ -18,7 +19,7 @@ export class Client {
     @Column({ nullable: false, unique: true })
     clientidentificationnumber: number;
 
-    @Column({ nullable: false, unique: true })
+    @Column({ nullable: false, unique: false })
     clientverificationnumber: number;
 
     @Column({ nullable: false, length: 80, unique: true })
@@ -40,17 +41,26 @@ export class Client {
     @Column({ nullable: false, length: 80, unique: true })
     clientaddress: string;
 
+    @Column({ nullable: false, default: 3 })
+    clientmaxworkers: number;
+
+    @Column({ nullable: false, default: 0 })
+    clientactualworkers: number;
+
     @Column({ nullable: true, type: 'boolean', default: true })
     isActive: boolean;
 
     @Column({ nullable: true, type: 'boolean', default: false })
     isDeleted: boolean;
 
-    @Column({ nullable: false, default: new Date() })
-    created_at: Date;
+    @OneToMany(() => Worker, (worker) => worker.client)
+    workers: Worker[];
 
     @Column({ nullable: false, default: new Date() })
-    updated_at: Date;
+    createdAt: Date;
+
+    @Column({ nullable: false, default: new Date() })
+    updatedAt: Date;
 
 }
 
