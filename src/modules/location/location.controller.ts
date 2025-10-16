@@ -1,11 +1,14 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LocationService } from './location.service';
 import { CountryResponseDto } from './dto/country.dto';
 import { DepartmentResponseDto } from './dto/department.dto';
 import { CityResponseDto } from './dto/city.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @ApiTags('Location')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('location')
 export class LocationController {
     constructor(private locationService: LocationService){}

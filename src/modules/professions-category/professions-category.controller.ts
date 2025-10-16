@@ -1,11 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/undefined-to-null-interceptor.interceptor';
 import { ProfessionsCategoryService } from './professions-category.service';
 import { CategoryWithProfessionDto, ProfessionCategoryCreateDto, ProfessionCategoryResponseDto, ProfessionCategoryStatusDto, ProfessionCategoryUpdateDto } from './dto/profession-category.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @ApiTags('Professions Category')
 @UseInterceptors(UndefinedToNullInterceptorInterceptor)
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('professions-category')
 export class ProfessionsCategoryController {
     constructor(private readonly professionsCategoryService: ProfessionsCategoryService) { }

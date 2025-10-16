@@ -148,6 +148,7 @@ export class UserResponseDto {
   useridentificationtype?: IdentificationTypeToUserDto;
   useridentificationnumber?: number;
   additionalInfo?: UserAditionalResponseDto;
+  isActive?: boolean;
 }
 
 export class UserAditionalResponseDto {
@@ -156,7 +157,6 @@ export class UserAditionalResponseDto {
   city?: CityWithDepartmentAndCountryDto;
   useraddress?: string;
   dateOfBirth?: Date;
-  isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   roles?: RoleInUser[] | [];

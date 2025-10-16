@@ -1,12 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { IdentificationTypeService } from './identification-type.service';
 import { CreateIdentificationTypeDto, IdentificationTypeResponseDto } from './dto/identification-type.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @ApiTags('Identification Type')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('identification-type')
 export class IdentificationTypeController {
-    constructor(private identificationTypeService: IdentificationTypeService) {}
+    constructor(private identificationTypeService: IdentificationTypeService) { }
 
     @Get('v1')
     @ApiOperation({

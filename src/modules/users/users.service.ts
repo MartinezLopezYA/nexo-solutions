@@ -79,6 +79,7 @@ export class UsersService {
                 username: user.username,
                 useremail: user.useremail,
                 userphone: user.userphone,
+                isActive: user.isActive,
                 useridentificationtype: {
                     identificationtypeuuid: user?.useridentificationtype.identificationtypeuuid,
                     identificationtypename: user?.useridentificationtype.identificationtypename,
@@ -101,7 +102,6 @@ export class UsersService {
                     },
                     useraddress: user?.useraddress,
                     dateOfBirth: user?.dateOfBirth,
-                    isActive: user.isActive,
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,
                     roles: user?.roles.map(role => ({
@@ -303,6 +303,7 @@ export class UsersService {
                 username: savedUser.username,
                 useremail: savedUser.useremail,
                 userphone: savedUser.userphone,
+                isActive: savedUser.isActive,
                 useridentificationtype: {
                     identificationtypeuuid: savedUser?.useridentificationtype?.identificationtypeuuid,
                     identificationtypename: savedUser?.useridentificationtype?.identificationtypename,
@@ -325,7 +326,6 @@ export class UsersService {
                     },
                     useraddress: savedUser.useraddress,
                     dateOfBirth: savedUser.dateOfBirth,
-                    isActive: savedUser.isActive,
                     createdAt: savedUser.createdAt,
                     updatedAt: savedUser.updatedAt,
                     roles: savedUser.roles,
