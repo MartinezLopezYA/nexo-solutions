@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { UserCreateDto, UserResponseDto, UserStatusDto, UserUpdateDto, UserWithRolesDto, UsersBasicResponseDto } from './dto/user.dto';
 import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/undefined-to-null-interceptor.interceptor';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Users')
 @UseInterceptors(UndefinedToNullInterceptorInterceptor)
@@ -14,6 +15,7 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get('v1')
+    @Permissions('LIST_ALL_USERS')
     @ApiOperation({
         summary: 'Get all users',
         description: 'This endpoint returns a list of all users.',
@@ -29,6 +31,7 @@ export class UsersController {
     }
 
     @Get('v1/active')
+    @Permissions('LIST_ACTIVE_USERS')
     @ApiOperation({
         summary: 'Get all active users',
         description: 'This endpoint returns a list of all active users.',
@@ -44,6 +47,7 @@ export class UsersController {
     }
 
     @Get('v1/:useruuid')
+    @Permissions('VIEW_USER_INFO')
     @ApiOperation({
         summary: 'Get a user by id',
         description: 'This endpoint returns a user by id.',
@@ -61,6 +65,7 @@ export class UsersController {
     }
 
     @Post('v1')
+    @Permissions('CREATE_USER')
     @ApiOperation({
         summary: 'Add a user',
         description: 'This endpoint adds a new user.',
@@ -78,6 +83,7 @@ export class UsersController {
     }
 
     @Patch('v1/:useruuid/status')
+    @Permissions('DEACTIVATE_USER', 'ACTIVATE_USER')
     @ApiOperation({
         summary: 'Update user status',
         description: 'This endpoint updates the status of a user.',
@@ -95,6 +101,7 @@ export class UsersController {
     }
 
     @Patch('v1/:useruuid')
+    @Permissions('UPDATE_USER')
     @ApiOperation({
         summary: 'Update user',
         description: 'This endpoint updates a user.',
@@ -113,6 +120,7 @@ export class UsersController {
     }
 
     @Delete('v1/:useruuid/remove')
+    @Permissions('DELETE_USER')
     @ApiOperation({
         summary: 'Delete a user',
         description: 'This endpoint deletes a user.',
@@ -130,6 +138,7 @@ export class UsersController {
     }
 
     @Post('v1/:useruuid/assign-roles')
+    @Permissions('ASSIGN_ROLES_TO_USER')
     @ApiOperation({
         summary: 'Assign roles to a user',
         description: 'This endpoint allows you to assign roles to a user.',

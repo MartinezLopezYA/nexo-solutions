@@ -14,6 +14,8 @@ import { ProfessionsModule } from './modules/professions/professions.module';
 import { ProfessionsCategoryModule } from './modules/professions-category/professions-category.module';
 import { WorkersModule } from './modules/workers/workers.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { PermissionsInterceptor } from './common/interceptors/permissions.interceptor';
 
 @Module({
   imports: [
@@ -50,6 +52,11 @@ import { AuthModule } from './modules/auth/auth.module';
     IdentificationTypeModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PermissionsInterceptor,
+    }
+  ],
 })
 export class AppModule {}

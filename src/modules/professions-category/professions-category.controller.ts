@@ -4,6 +4,7 @@ import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/u
 import { ProfessionsCategoryService } from './professions-category.service';
 import { CategoryWithProfessionDto, ProfessionCategoryCreateDto, ProfessionCategoryResponseDto, ProfessionCategoryStatusDto, ProfessionCategoryUpdateDto } from './dto/profession-category.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Professions Category')
 @UseInterceptors(UndefinedToNullInterceptorInterceptor)
@@ -14,6 +15,7 @@ export class ProfessionsCategoryController {
     constructor(private readonly professionsCategoryService: ProfessionsCategoryService) { }
 
     @Get('v1/:professioncategoryuuid')
+    @Permissions('VIEW_CATEGORY_OF_PROFESSION_INFO')
     @ApiOperation({
         summary: 'Get profession category by uuid',
         description: 'This endpoint returns a profession category by uuid.',
@@ -29,6 +31,7 @@ export class ProfessionsCategoryController {
     }
 
     @Get('v1')
+    @Permissions('LIST_ALL_CATEGORIES_OF_PROFESSIONS')
     @ApiOperation({
         summary: 'Get all professions category',
         description: 'This endpoint returns a list of all professions category.',
@@ -44,6 +47,7 @@ export class ProfessionsCategoryController {
     }
 
     @Get('v1/active')
+    @Permissions('LIST_ACTIVE_CATEGORIES_OF_PROFESSIONS')
     @ApiOperation({
         summary: 'Get all active professions category',
         description: 'This endpoint returns a list of all active professions category.',
@@ -59,6 +63,7 @@ export class ProfessionsCategoryController {
     }
 
     @Post('v1')
+    @Permissions('CREATE_CATEGORY_OF_PROFESSION')
     @ApiOperation({
         summary: 'Add a Profession Category',
         description: 'This endpoint adds a new Prefession Category'
@@ -74,6 +79,7 @@ export class ProfessionsCategoryController {
     }
 
     @Patch('v1/:professioncategoryuuid/status')
+    @Permissions('DEACTIVATE_CATEGORY_OF_PROFESSION', 'ACTIVATE_CATEGORY_OF_PROFESSION')
     @ApiOperation({
         summary: 'Update profession category status',
         description: 'This endpoint updates the status of a profession category.',
@@ -91,6 +97,7 @@ export class ProfessionsCategoryController {
     }
 
     @Patch('v1/:professioncategoryuuid')
+    @Permissions('UPDATE_CATEGORY_OF_PROFESSION')
     @ApiOperation({
         summary: 'Update profession category',
         description: 'This endpoint updates a profession category.',
@@ -109,6 +116,7 @@ export class ProfessionsCategoryController {
     }
 
     @Delete('v1/:professioncategoryuuid/remove')
+    @Permissions('DELETE_CATEGORY_OF_PROFESSION')
     @ApiOperation({
         summary: 'Delete a profession category',
         description: 'This endpoint deletes a profession category.',
@@ -126,6 +134,7 @@ export class ProfessionsCategoryController {
     }
 
     @Post('v1/:professioncategoryuuid/assign-professions')
+    @Permissions('ASSIGN_PROFESSIONS_TO_CATEGORY')
     @ApiOperation({
         summary: 'Assign professions to a profession category',
         description: 'This endpoint assigns professions to a profession category.',

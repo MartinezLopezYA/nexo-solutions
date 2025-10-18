@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { RolesService } from './roles.service';
 import { CreateRoleDto, RoleDeletedDto, RoleResponseDto, RoleWithPermissionsDto, UpdateRoleDto } from './dto/role.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Roles')
 @UseGuards(JwtAuthGuard)
@@ -12,6 +13,7 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) { }
 
   @Get('v1')
+  @Permissions('LIST_ALL_ROLES')
   @ApiOperation({
     summary: 'Get all roles',
     description: 'This endpoint returns a list of all roles.',
@@ -27,6 +29,7 @@ export class RolesController {
   }
 
   @Get('v1/active')
+  @Permissions('LIST_ACTIVE_ROLES')
   @ApiOperation({
     summary: 'Get all active roles',
     description: 'This endpoint returns a list of all active roles.',
@@ -59,6 +62,7 @@ export class RolesController {
   }
 
   @Post('v1')
+  @Permissions('CREATE_ROLE')
   @ApiOperation({
     summary: 'Add a new role',
     description: 'This endpoint allows you to add a new role.',
@@ -74,6 +78,7 @@ export class RolesController {
   }
 
   @Patch('v1/:roleuuid')
+  @Permissions('UPDATE_ROLE')
   @ApiOperation({
     summary: 'Update an existing role',
     description: 'This endpoint allows you to update an existing role.',
@@ -92,6 +97,7 @@ export class RolesController {
   }
 
   @Patch('v1/:roleuuid/status')
+  @Permissions('DEACTIVATE_ROLE', 'ACTIVATE_ROLE')
   @ApiOperation({
     summary: 'Update the status of a role',
     description: 'This endpoint allows you to update the status of a role.',
@@ -109,6 +115,7 @@ export class RolesController {
   }
 
   @Delete('v1/:roleuuid')
+  @Permissions('DELETE_ROLE')
   @ApiOperation({
     summary: 'Delete a role',
     description: 'This endpoint allows you to delete a role.',
@@ -120,6 +127,7 @@ export class RolesController {
   }
 
   @Post('v1/:roleuuid/assign-permissions')
+  @Permissions('ASSIGN_PERMISSIONS_TO_ROLE')
   @ApiOperation({
     summary: 'Assign permissions to a role',
     description: 'This endpoint allows you to assign permissions to a role.',

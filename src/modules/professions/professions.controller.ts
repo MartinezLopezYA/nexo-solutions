@@ -4,6 +4,7 @@ import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/u
 import { ProfessionsService } from './professions.service';
 import { ProfessionCreateDto, ProfessionResponseDto, ProfessionStatusDto, ProfessionUpdateDto, ProfessionWithCategoriesDto } from './dto/profession.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Professions')
 @UseInterceptors(UndefinedToNullInterceptorInterceptor)
@@ -14,6 +15,7 @@ export class ProfessionsController {
     constructor(private readonly professionsService: ProfessionsService) { }
 
     @Get('v1/:professionuuid')
+    @Permissions('VIEW_PROFESSION_INFO')
     @ApiOperation({
         summary: 'Get profession by uuid',
         description: 'This endpoint returns a profession by uuid.',
@@ -29,6 +31,7 @@ export class ProfessionsController {
     }
 
     @Get('v1')
+    @Permissions('LIST_ALL_PROFESSIONS')
     @ApiOperation({
         summary: 'Get all professions',
         description: 'This endpoint returns all professions.'
@@ -45,6 +48,7 @@ export class ProfessionsController {
     }
 
     @Post('v1')
+    @Permissions('CREATE_PROFESSION')
     @ApiOperation({
         summary: 'Add a Profession',
         description: 'This endpoint adds a new Profession'
@@ -60,6 +64,7 @@ export class ProfessionsController {
     }
 
     @Patch('v1/:professionuuid/status')
+    @Permissions('DEACTIVATE_PROFESSION', 'ACTIVATE_PROFESSION')
     @ApiOperation({
         summary: 'Update a Profession status',
         description: 'This endpoint updates a profession status by uuid.'
@@ -71,6 +76,7 @@ export class ProfessionsController {
     }
 
     @Patch('v1/:professionuuid')
+    @Permissions('UPDATE_PROFESSION')
     @ApiOperation({
         summary: 'Update a Profession',
         description: 'This endpoint updates a profession by uuid.'
@@ -82,6 +88,7 @@ export class ProfessionsController {
     }
 
     @Delete('v1/:professionuuid')
+    @Permissions('DELETE_PROFESSION')
     @ApiOperation({
         summary: 'Delete a Profession',
         description: 'This endpoint deletes a profession by uuid.'

@@ -28,8 +28,7 @@ export class AuthController {
     })
     @ApiResponse({ status: 404, description: 'User not found' })
     async getProfile(@Param('useruuid') useruuid: string): Promise<UserResponseDto> {
-        const user = await this.userService.getUserByUuid(useruuid);
-        return user;
+        return this.userService.getUserById(useruuid);
     }
 
     @Get('v1/check-session/:useruuid')

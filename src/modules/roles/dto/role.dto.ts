@@ -52,6 +52,7 @@ export class RoleWithPermissionsDto {
 export class RoleInUser {
   roleuuid: string | null;
   rolename: string | null;
+  rolecode: string | null;
   permissions: PermissionInRoleDto[] | [];
 }
 

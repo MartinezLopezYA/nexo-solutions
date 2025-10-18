@@ -3,6 +3,7 @@ import { IdentificationTypeService } from './identification-type.service';
 import { CreateIdentificationTypeDto, IdentificationTypeResponseDto } from './dto/identification-type.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Identification Type')
 @UseGuards(JwtAuthGuard)
@@ -27,6 +28,7 @@ export class IdentificationTypeController {
     }
 
     @Post('v1')
+    @Permissions('CREATE_TYPE_OF_IDENTIFICATION')
     @ApiOperation({
         summary: 'Add a new identification type',
         description: 'This endpoint allows you to add a new identification type.',

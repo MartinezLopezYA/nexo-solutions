@@ -4,6 +4,7 @@ import { ClientsService } from './clients.service';
 import { ClientCreateDto, ClientResponseDto, ClientStatusDto, ClientUpdateDto } from './dto/client.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Clients')
 @UseGuards(JwtAuthGuard)
@@ -13,6 +14,7 @@ export class ClientsController {
     constructor(private readonly clientsService: ClientsService) {}
 
     @Get('v1')
+    @Permissions('LIST_ALL_CLIENTS')
     @ApiOperation({
         summary: 'Get all clients',
         description: 'This endpoint returns a list of all clients.',
@@ -28,6 +30,7 @@ export class ClientsController {
     }
 
     @Get('v1/:clientuuid')
+    @Permissions('VIEW_CLIENT_INFO')
     @ApiOperation({
         summary: 'Get client by uuid',
         description: 'This endpoint returns a client by uuid.',
@@ -43,6 +46,7 @@ export class ClientsController {
     }
 
     @Post('v1')
+    @Permissions('CREATE_CLIENT')
     @ApiOperation({
         summary: 'Add a client',
         description: 'This endpoint adds a new client.',
@@ -58,6 +62,7 @@ export class ClientsController {
     }
 
     @Patch('v1/:clientuuid/status')
+    @Permissions('DEACTIVATE_CLIENT', 'ACTIVATE_CLIENT')
     @ApiOperation({
         summary: 'Update client status',
         description: 'This endpoint updates the status of a client.',
@@ -73,6 +78,7 @@ export class ClientsController {
     }
 
     @Patch('v1/:clientuuid')
+    @Permissions('UPDATE_CLIENT')
     @ApiOperation({
         summary: 'Update client',
         description: 'This endpoint updates a client.',
@@ -88,6 +94,7 @@ export class ClientsController {
     }
 
     @Delete('v1/:clientuuid/remove')
+    @Permissions('DELETE_CLIENT')
     @ApiOperation({
         summary: 'Delete a client',
         description: 'This endpoint deletes a client.',

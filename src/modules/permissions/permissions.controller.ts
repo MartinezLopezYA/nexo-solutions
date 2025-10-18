@@ -3,6 +3,7 @@ import { PermissionsService } from './permissions.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePermissionDto, PermissionDeletedDto, PermissionResponseDto, UpdatePermissionDto } from './dto/permission.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Permissions')
 @UseGuards(JwtAuthGuard)
@@ -12,6 +13,7 @@ export class PermissionsController {
   constructor(private permissionsService: PermissionsService) { }
 
   @Get('v1')
+  @Permissions('LIST_ALL_PERMISSIONS')
   @ApiOperation({
     summary: 'Get all permissions',
     description: 'This endpoint returns a list of all permissions.',
@@ -27,6 +29,7 @@ export class PermissionsController {
   }
 
   @Get('v1/active')
+  @Permissions('LIST_ACTIVE_PERMISSIONS')
   @ApiOperation({
     summary: 'Get all active permissions',
     description: 'This endpoint returns a list of all active permissions.',
@@ -42,6 +45,7 @@ export class PermissionsController {
   }
 
   @Post('v1/')
+  @Permissions('CREATE_PERMISSION')
   @ApiOperation({
     summary: 'Add a new permission',
     description: 'This endpoint allows you to add a new permission.',
@@ -59,6 +63,7 @@ export class PermissionsController {
   }
 
   @Patch('v1/:permissionuuid')
+  @Permissions('UPDATE_PERMISSION')
   @ApiOperation({
     summary: 'Update an existing permission',
     description: 'This endpoint allows you to update an existing permission.',
@@ -77,6 +82,7 @@ export class PermissionsController {
   }
 
   @Patch('v1/:permissionuuid/status')
+  @Permissions('DEACTIVATE_PERMISSION', 'ACTIVATE_PERMISSION')
   @ApiOperation({
     summary: 'Update the status of a permission',
     description:
@@ -95,6 +101,7 @@ export class PermissionsController {
   }
 
   @Delete('v1/:permissionuuid')
+  @Permissions('DELETE_PERMISSION')
   @ApiOperation({
     summary: 'Delete a permission',
     description: 'This endpoint allows you to delete a permission.',

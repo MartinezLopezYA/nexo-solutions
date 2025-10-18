@@ -4,6 +4,7 @@ import { WorkersService } from './workers.service';
 import { WorkerCreateDto, WorkerResponseDto, WorkerStatusDto, WorkerUpdateDto } from './dto/worker.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Workers')
 @UseGuards(JwtAuthGuard)
@@ -13,6 +14,7 @@ export class WorkersController {
     constructor(private readonly workersService: WorkersService) {}
 
     @Get('v1')
+    @Permissions('LIST_ALL_EMPLOYEES')
     @ApiOperation({
         summary: 'Get all workers',
         description: 'This endpoint returns a list of all workers.',
@@ -28,6 +30,7 @@ export class WorkersController {
     }
 
     @Get('v1/:clientuuid')
+    @Permissions('VIEW_CLIENT_EMPLOYEES')
     @ApiOperation({
         summary: 'Get all workers by client',
         description: 'This endpoint returns a list of all workers by client.',
@@ -45,6 +48,7 @@ export class WorkersController {
     }
 
     @Post('v1')
+    @Permissions('CREATE_EMPLOYEES')
     @ApiOperation({
         summary: 'Add a worker',
         description: 'This endpoint adds a new worker.',
@@ -62,6 +66,7 @@ export class WorkersController {
     }
 
     @Patch('v1/:workeruuid/status')
+    @Permissions('DEACTIVATE_EMPLOYEES', 'ACTIVATE_EMPLOYEES')
     @ApiOperation({
         summary: 'Update worker status',
         description: 'This endpoint updates the status of a worker.',
@@ -79,6 +84,7 @@ export class WorkersController {
     }
 
     @Patch('v1/:workeruuid')
+    @Permissions('UPDATE_EMPLOYEES')
     @ApiOperation({
         summary: 'Update worker',
         description: 'This endpoint updates a worker.',
@@ -97,6 +103,7 @@ export class WorkersController {
     }
 
     @Delete('v1/:workeruuid/remove')
+    @Permissions('DELETE_EMPLOYEES')
     @ApiOperation({
         summary: 'Delete a worker',
         description: 'This endpoint deletes a worker.',

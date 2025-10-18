@@ -64,7 +64,9 @@ export class UsersService {
                 },
                 relations: {
                     useridentificationtype: true,
-                    userprofession: true,
+                    userprofession: {
+                        professioncategory: true,
+                    },
                     roles: {
                         permissions: true,
                     },
@@ -93,7 +95,14 @@ export class UsersService {
                 useridentificationnumber: user?.useridentificationnumber,
                 additionalInfo: {
                     usergender: user?.usergender,
-                    userprofession: user?.userprofession,
+                    userprofession: {
+                        professionuuid: user?.userprofession.professionuuid,
+                        professionname: user?.userprofession.professionname,
+                        professioncategory: {
+                            professioncategoryuuid: user?.userprofession.professioncategory.professioncategoryuuid,
+                            professioncategoryname: user?.userprofession.professioncategory.professioncategoryname,
+                        },
+                    },
                     city: {
                         cityuuid: user?.city?.cityuuid,
                         cityname: user?.city?.cityname,
@@ -113,6 +122,7 @@ export class UsersService {
                     roles: user?.roles.map(role => ({
                         roleuuid: role.roleuuid,
                         rolename: role.rolename,
+                        rolecode: role.rolecode,
                         permissions: role?.permissions.filter((permission) => permission.isActive).map((permission) => ({
                             permissionuuid: permission.permissionuuid,
                             permissionname: permission.permissionname,
@@ -393,6 +403,7 @@ export class UsersService {
                 roles: savedUser.roles.map(role => ({
                     roleuuid: role.roleuuid,
                     rolename: role.rolename,
+                    rolecode: role.rolecode,
                     permissions: role?.permissions?.map(permission => ({
                         permissionuuid: permission.permissionuuid,
                         permissionname: permission.permissionname,
