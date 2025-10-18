@@ -18,9 +18,9 @@ import { WorkersModule } from '../workers/workers.module';
         ConfigModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => ({
+            useFactory: async (configService: ConfigService) => ({
                 secret: configService.get('JWT_SECRET'),
-                signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') || '1h' },
+                signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') || '5m' },
             }),
             inject: [ConfigService],
         }),

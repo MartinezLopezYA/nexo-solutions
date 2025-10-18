@@ -14,5 +14,17 @@ export class CredentialsRequestDto {
 
 export class AuthResponseDto {
     access_token: string;
+    refresh_token: string;
     user: UserResponseDto;
 }
+
+export class RefreshTokenDto {
+    @IsString()
+    refresh_token: string;
+}
+
+export class LogoutDto {
+    @IsString()
+    useruuid: string;
+}
+

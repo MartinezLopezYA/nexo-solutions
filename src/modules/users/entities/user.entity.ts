@@ -71,4 +71,7 @@ export class User {
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
+  @Column({ nullable: true })
+  refreshToken: string | null;
+
 }

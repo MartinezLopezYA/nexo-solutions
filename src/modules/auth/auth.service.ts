@@ -7,6 +7,7 @@ import { AuthResponseDto, CredentialsRequestDto } from './dto/auth.dto';
 import { ClientsService } from '../clients/clients.service';
 import { WorkersService } from '../workers/workers.service';
 import { InternalException } from 'src/common/exceptions/internal-exception';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
         private clientService: ClientsService,
         private workerService: WorkersService,
         private jwtService: JwtService,
+        private configService: ConfigService,
     ) { }
 
     async login(user: CredentialsRequestDto): Promise<AuthResponseDto> {
@@ -40,9 +42,23 @@ export class AuthService {
                 throw new UnauthorizedException('User is deleted', HttpStatus.UNAUTHORIZED, 'USER_IS_DELETED_ERROR');
             }
 
-            const token = this.jwtService.sign({ useremail: userExist.useremail });
+            const payload = { useremail: userExist.useremail, sub: userExist.useruuid };
+
+            const accessToken = this.jwtService.sign(payload, {
+                secret: this.configService.get('JWT_SECRET'),
+                expiresIn: this.configService.get('JWT_EXPIRES_IN'),
+            });
+
+            const refreshToken = this.jwtService.sign(payload, {
+                secret: this.configService.get('JWT_REFRESH_SECRET'),
+                expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
+            });
+
+            await this.userService.saveRefreshToken(userExist.useruuid, refreshToken);
+
             const loginResponse: AuthResponseDto = {
-                access_token: token,
+                access_token: accessToken,
+                refresh_token: refreshToken,
                 user: {
                     useruuid: userExist.useruuid,
                     firstname: userExist.firstname,
@@ -62,8 +78,34 @@ export class AuthService {
         }
     }
 
+    async refreshToken(token: string): Promise<{ access_token: string }> {
+        try {
+            const payload = this.jwtService.verify(token, {
+                secret: this.configService.get('JWT_REFRESH_SECRET'),
+            });
 
+            const user = await this.userService.getUserByEmail(payload.useremail);
+            if (!user) throw new UnauthorizedException('Invalid refresh token', HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_INVALID_ERROR');
+
+            const isValid = await this.userService.validateRefreshToken(user.useruuid, token);
+            if (!isValid) throw new UnauthorizedException('Invalid refresh token', HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_INVALID_ERROR');
+
+            const newAccessToken = this.jwtService.sign(
+                { useremail: user.useremail, sub: user.useruuid },
+                {
+                    secret: this.configService.get('JWT_SECRET'),
+                    expiresIn: this.configService.get('JWT_EXPIRES_IN'),
+                }
+            );
+
+            return { access_token: newAccessToken };
+        } catch {
+            throw new UnauthorizedException('Refresh token inválido', HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_INVALID_ERROR');
+        }
+    }
+
+    async logout(useruuid: string): Promise<void> {
+        await this.userService.removeRefreshToken(useruuid);
+    }
 
 }
-
-//  Windows + . = Emojis

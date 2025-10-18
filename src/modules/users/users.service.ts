@@ -26,6 +26,12 @@ export class UsersService {
         private readonly cityRepository: Repository<City>,
     ) { }
 
+    async getUserByUuid(useruuid: string): Promise<User> {
+        return await this.userRepository.findOneBy({
+            useruuid: useruuid
+        });
+    }
+
     async getUserByUsername(username: string): Promise<User> {
         return await this.userRepository.findOneBy({
             username: username
@@ -215,7 +221,7 @@ export class UsersService {
             if (!city) throw new NotFoundException('City not found', HttpStatus.NOT_FOUND, 'NF_CITY_ERROR');
 
             const saltOrRounds = 10;
-            const hashedPassword = await bcrypt.hash(user.password, saltOrRounds);
+            const hashedPassword = await bcrypt.hash(user.userpassword, saltOrRounds);
 
             const newUserData: DeepPartial<User> = {
                 ...user,
@@ -398,6 +404,22 @@ export class UsersService {
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while assigning roles to the user');
         }
+    }
+
+
+    async saveRefreshToken(userId: string, token: string): Promise<void> {
+        const hashedToken = await bcrypt.hash(token, 10);
+        await this.userRepository.update(userId, { refreshToken: hashedToken });
+    }
+
+    async removeRefreshToken(userId: string): Promise<void> {
+        await this.userRepository.update(userId, { refreshToken: null });
+    }
+
+    async validateRefreshToken(userId: string, token: string): Promise<boolean> {
+        const user = await this.userRepository.findOne({ where: { useruuid: userId } });
+        if (!user || !user.refreshToken) return false;
+        return bcrypt.compare(token, user.refreshToken);
     }
 
     private async ensureUserDoesNotExist(type: 'useremail' | 'useridentificationnumber', value: string | number, code: string) {
