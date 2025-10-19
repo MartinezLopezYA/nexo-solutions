@@ -5,6 +5,7 @@ import { ApiBody, ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse } from
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
 import { UserResponseDto } from '../users/dto/user.dto';
+import { GetUser } from 'src/common/decorators/users.decorator';
 
 
 @Controller('auth')
@@ -14,7 +15,7 @@ export class AuthController {
         private userService: UsersService
     ) { }
 
-    @Get('v1/profile/:useruuid')
+    @Get('v1/profile')
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
@@ -27,11 +28,11 @@ export class AuthController {
         type: UserResponseDto,
     })
     @ApiResponse({ status: 404, description: 'User not found' })
-    async getProfile(@Param('useruuid') useruuid: string): Promise<UserResponseDto> {
+    async getProfile(@GetUser('useruuid') useruuid: string): Promise<UserResponseDto> {
         return this.userService.getUserById(useruuid);
     }
 
-    @Get('v1/check-session/:useruuid')
+    @Get('v1/check-session')
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOkResponse({
@@ -48,7 +49,7 @@ export class AuthController {
             }
         }
     })
-    async validateSession(@Param('useruuid') useruuid: string) {
+    async validateSession(@GetUser('useruuid') useruuid: string) {
         const user = await this.userService.getUserByUuid(useruuid);
         const hasRefreshToken = !!user.refreshToken;
 
@@ -57,9 +58,12 @@ export class AuthController {
             refreshToken: hasRefreshToken,
             user: {
                 useruuid: user.useruuid,
-                useremail: user.useremail,
                 firstname: user.firstname,
                 lastname: user.lastname,
+                username: user.username,
+                useremail: user.useremail,
+                userphone: user.userphone,
+                useridentificationnumber: user.useridentificationnumber
             }
         };
     }
@@ -79,9 +83,8 @@ export class AuthController {
     @Post('v1/logout')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiBody({ type: LogoutDto })
-    async logout(@Body() body: LogoutDto): Promise<{ message: string }> {
-        await this.authService.logout(body.useruuid);
+    async logout(@GetUser('useruuid') useruuid: string): Promise<{ message: string }> {
+        await this.authService.logout(useruuid);
         return { message: 'User logged out successfully' };
     }
 
