@@ -144,8 +144,8 @@ export class UsersService {
                 order: { firstname: 'ASC' },
                 relations: {
                     useridentificationtype: true,
-                    userprofession: true,
-                    roles: true,
+                    userprofession: {},
+                    roles: {},
                     city: {
                         department: {
                             country: true,
@@ -163,13 +163,30 @@ export class UsersService {
                 username: user.username,
                 useremail: user.useremail,
                 userphone: user.userphone,
-                userprofession: user?.userprofession,
-                useridentificationtype: user?.useridentificationtype,
+                roles: user?.roles.map(role => ({
+                        roleuuid: role.roleuuid,
+                        rolename: role.rolename,
+                        rolecode: role.rolecode,
+                    }
+                )) || null,
+                userprofession: {
+                    professionuuid: user?.userprofession?.professionuuid,
+                    professionname: user?.userprofession?.professionname,
+                    professioncategory: {
+                        professioncategoryuuid: user?.userprofession?.professioncategory?.professioncategoryuuid,
+                        professioncategoryname: user?.userprofession?.professioncategory?.professioncategoryname
+                    }
+                },
+                useridentificationtype: {
+                    identificationtypeuuid: user?.useridentificationtype?.identificationtypeuuid,
+                    identificationtypename: user?.useridentificationtype?.identificationtypename
+                },
                 useridentificationnumber: user?.useridentificationnumber,
                 isActive: user.isActive
             } as UsersBasicResponseDto)) || [];
             return userResponseDto;
         } catch (error) {
+            console.log(error)
             this.handleInternalError(error, 'An error occurred while getting all users');
         }
     }

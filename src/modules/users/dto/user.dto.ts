@@ -1,7 +1,7 @@
 import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, IsUUID, Length, Matches, MinLength, IsOptional, IsNotEmpty } from 'class-validator';
 import { IdentificationTypeToUserDto } from 'src/modules/identification-type/dto/identification-type.dto';
 import { CityWithDepartmentAndCountryDto } from 'src/modules/location/dto/city.dto';
-import { RoleInUser } from 'src/modules/roles/dto/role.dto';
+import { RoleInUser, RolesInUser } from 'src/modules/roles/dto/role.dto';
 import { Transform, Type } from 'class-transformer';
 import { capitalize, capitalizeFirstLetter } from 'src/common/utils/format';
 import { ProfessionWithCategoriesDto } from 'src/modules/professions/dto/profession.dto';
@@ -132,6 +132,7 @@ export class UsersBasicResponseDto {
   username: string;
   useremail: string;
   userphone: string;
+  roles?: RolesInUser[] | [];
   userprofession: ProfessionWithCategoriesDto;
   useridentificationtype: IdentificationTypeToUserDto;
   useridentificationnumber: number;

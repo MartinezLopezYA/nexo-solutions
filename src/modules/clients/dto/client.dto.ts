@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { TypeClientEnum } from "../enums/client.enum";
+import { TypeClientEnum } from "../../../common/enums/client.enum";
 import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Length } from "class-validator";
 import { capitalize, capitalizeFirstLetter } from "src/common/utils/format";
 import { IdentificationTypeToUserDto } from "src/modules/identification-type/dto/identification-type.dto";

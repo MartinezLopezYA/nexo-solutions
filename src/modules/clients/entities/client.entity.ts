@@ -1,4 +1,4 @@
-import { TypeClientEnum } from '../../clients/enums/client.enum';
+import { TypeClientEnum } from '../../../common/enums/client.enum';
 import { IdentificationType } from '../../identification-type/entities/identification-type.entity';
 import { City } from '../../location/entities/city.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';

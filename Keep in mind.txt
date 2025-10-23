@@ -1,5 +1,5 @@
 TODO Crear projects module
-TODO implementar seguridad, de cors, roles, permisos, interceptors, guards, etc
+TODO implementar seguridad, de cors, etc
 TODO Implementación de projects y validar el tipo de usuario logueado si es user o worker
 TODO Roles y permisos de usuario logueado
 

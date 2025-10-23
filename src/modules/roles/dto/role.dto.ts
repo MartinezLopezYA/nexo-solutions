@@ -56,6 +56,12 @@ export class RoleInUser {
   permissions: PermissionInRoleDto[] | [];
 }
 
+export class RolesInUser {
+  roleuuid: string | null;
+  rolename: string | null;
+  rolecode: string | null;
+}
+
 export class RoleDeletedDto {
   message: string;
   rolename: string;
