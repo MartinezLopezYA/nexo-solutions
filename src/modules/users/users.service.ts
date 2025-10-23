@@ -274,6 +274,7 @@ export class UsersService {
             }
             return userResponse;
         } catch (error) {
+            console.log(error)
             this.handleInternalError(error, 'An error occurred while adding a user');
         }
     }

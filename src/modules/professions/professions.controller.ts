@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterc
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UndefinedToNullInterceptorInterceptor } from 'src/common/interceptors/undefined-to-null-interceptor.interceptor';
 import { ProfessionsService } from './professions.service';
-import { ProfessionCreateDto, ProfessionResponseDto, ProfessionStatusDto, ProfessionUpdateDto, ProfessionWithCategoriesDto } from './dto/profession.dto';
+import { ProfessionCreateDto, ProfessionInCategoryDto, ProfessionResponseDto, ProfessionStatusDto, ProfessionUpdateDto, ProfessionWithCategoriesDto } from './dto/profession.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
 
@@ -28,6 +28,22 @@ export class ProfessionsController {
     @ApiResponse({ status: 404, description: 'Profession not found' })
     async getProfessionByUuid(@Param('professionuuid') professionuuid: string): Promise<ProfessionWithCategoriesDto> {
         return this.professionsService.getProfessionByUuid(professionuuid);
+    }
+
+    @Get('v1/:professioncategoryuuid')
+    @Permissions('LIST_ALL_PROFESSIONS')
+    @ApiOperation({
+        summary: 'Get profession by category',
+        description: 'This endpoint returns a profession by category.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Professions found',
+        type: ProfessionInCategoryDto,
+    })
+    @ApiResponse({ status: 404, description: 'Professions not found' })
+    async getProfessionByCategory(@Param('professioncategoryuuid') professioncategoryuuid: string): Promise<ProfessionInCategoryDto[]> {
+        return this.professionsService.getProfessionsByCategory(professioncategoryuuid);
     }
 
     @Get('v1')

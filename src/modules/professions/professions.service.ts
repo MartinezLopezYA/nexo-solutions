@@ -4,7 +4,9 @@ import { Profession } from './entities/profession.entity';
 import { Repository } from 'typeorm';
 import { ProfessionCategory } from '../professions-category/entities/profession-category.entity';
 import { AlreadyExistsException, NotFoundException } from 'src/common/exceptions/general-exception.';
-import { ProfessionCreateDto, ProfessionResponseDto, ProfessionStatusDto, ProfessionUpdateDto, ProfessionWithCategoriesDto } from './dto/profession.dto';
+import { ProfessionCreateDto, ProfessionInCategoryDto, ProfessionResponseDto, ProfessionStatusDto, ProfessionUpdateDto, ProfessionWithCategoriesDto } from './dto/profession.dto';
+import { CategoryWithProfessionDto } from '../professions-category/dto/profession-category.dto';
+import { InternalException } from 'src/common/exceptions/internal-exception';
 
 @Injectable()
 export class ProfessionsService {
@@ -13,7 +15,7 @@ export class ProfessionsService {
         private readonly professionRepository: Repository<Profession>,
         @InjectRepository(ProfessionCategory)
         private readonly professionCategoryRepository: Repository<ProfessionCategory>
-    ) {}
+    ) { }
 
     async getProfessionByName(professionname: string): Promise<Profession> {
         return await this.professionRepository.findOneBy({
@@ -41,14 +43,14 @@ export class ProfessionsService {
             });
             if (!professions) throw new NotFoundException('No professions found', HttpStatus.NOT_FOUND, 'NF_PROFESSION_ERROR');
 
-            const professionResponseDto = professions.map((profession) =>( {
-                    professionuuid: profession.professionuuid,
-                    professionname: profession.professionname,
-                    professiondescription: profession.professiondescription,
-                    professionabbreviation: profession.professionabbreviation,
-                    professioncode: profession.professioncode,
-                    isActive: profession.isActive,
-                } as ProfessionResponseDto)) || [];
+            const professionResponseDto = professions.map((profession) => ({
+                professionuuid: profession.professionuuid,
+                professionname: profession.professionname,
+                professiondescription: profession.professiondescription,
+                professionabbreviation: profession.professionabbreviation,
+                professioncode: profession.professioncode,
+                isActive: profession.isActive,
+            } as ProfessionResponseDto)) || [];
             return professionResponseDto;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while getting all professions');
@@ -62,7 +64,7 @@ export class ProfessionsService {
             })
             if (!profession) throw new NotFoundException(`Profession with uuid ${uuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_ERROR');
 
-            const professionResponseDto: ProfessionWithCategoriesDto ={
+            const professionResponseDto: ProfessionWithCategoriesDto = {
                 professionuuid: profession.professionuuid,
                 professionname: profession.professionname,
                 professioncategory: profession.professioncategory ? {
@@ -74,6 +76,32 @@ export class ProfessionsService {
             return professionResponseDto;
         } catch (error) {
             this.handleInternalError(error, 'An error occurred while getting the profession by uuid');
+        }
+    }
+
+    async getProfessionsByCategory(professionscategoryuuid: string): Promise<ProfessionInCategoryDto[]> {
+        try {
+            const professioncategory = await this.professionCategoryRepository.findOneBy({
+                professioncategoryuuid: professionscategoryuuid
+            })
+
+            if (!professioncategory) throw new NotFoundException(`Profession Category with uuid ${professionscategoryuuid} not found`, HttpStatus.NOT_FOUND, 'NF_PROFESSION_CATEGORY_ERROR')
+
+            const professions = await this.professionRepository.find({
+                where: { professioncategory: { professioncategoryuuid: professionscategoryuuid } },
+                order: { professionname: 'ASC' }
+            });
+
+            if (!professions || professions.length === 0) throw new NotFoundException('No professions found', HttpStatus.NOT_FOUND, 'NF_PROFESSIONS_ERROR');
+
+            const professionsResponseDto = professions.map(profession => ({
+                professionuuid: profession.professionuuid,
+                professionname: profession.professionname,
+            } as ProfessionInCategoryDto)) || [];
+
+            return professionsResponseDto;
+        } catch (error) {
+            throw new InternalException('An error ocurred while retrieving the professions');
         }
     }
 
