@@ -91,7 +91,7 @@ export class RolesController {
   @ApiResponse({ status: 404, description: 'Role not found' })
   async updateRole(
     @Param('roleuuid') roleuuid: string,
-    @Body() role: Partial<UpdateRoleDto>,
+    @Body() role: UpdateRoleDto,
   ): Promise<RoleResponseDto> {
     return this.rolesService.updateRole(roleuuid, role);
   }
@@ -114,7 +114,7 @@ export class RolesController {
     return this.rolesService.updateRoleStatus(roleuuid);
   }
 
-  @Delete('v1/:roleuuid')
+  @Delete('v1/:roleuuid/remove')
   @Permissions('DELETE_ROLE')
   @ApiOperation({
     summary: 'Delete a role',

@@ -186,7 +186,6 @@ export class UsersService {
             } as UsersBasicResponseDto)) || [];
             return userResponseDto;
         } catch (error) {
-            console.log(error)
             this.handleInternalError(error, 'An error occurred while getting all users');
         }
     }
@@ -308,8 +307,8 @@ export class UsersService {
 
             if (!existingUser) throw new NotFoundException(`User with uuid ${useruuid} not found`, HttpStatus.NOT_FOUND, 'NF_USER_ERROR');
 
-            await this.ensureUserDoesNotExist('useremail', user.useremail, 'AEE_USER_ERROR');
-            await this.ensureUserDoesNotExist('useridentificationnumber', user.useridentificationnumber, 'AEIN_USER_ERROR');
+            if (existingUser && existingUser.useremail !== user.useremail) await this.ensureUserDoesNotExist('useremail', user.useremail, 'AEE_USER_ERROR');
+            if (existingUser && existingUser.useridentificationnumber !== user.useridentificationnumber) await this.ensureUserDoesNotExist('useridentificationnumber', user.useridentificationnumber, 'AEIN_USER_ERROR');
 
             const [identificationType, profession, city] = await Promise.all([
                 this.identificationTypeRepository.findOneBy({ identificationtypeuuid: user.identificationtypeuuid }),

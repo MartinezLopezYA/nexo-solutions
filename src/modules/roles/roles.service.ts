@@ -34,7 +34,7 @@ export class RolesService {
 
       return roleResponseDto;
     } catch (error) {
-      throw new InternalException('An error occurred while updating the role');
+      this.handleInternalError(error, 'An error occurred while getting the roles');
     }
   }
 
@@ -57,7 +57,7 @@ export class RolesService {
 
       return roleResponseDto;
     } catch (error) {
-      throw new InternalException('An error occurred while updating the role');
+      this.handleInternalError(error, 'An error occurred while getting the roles');
     }
   }
 
@@ -85,7 +85,7 @@ export class RolesService {
 
       return roleWithPermissions;
     } catch (error) {
-      throw new InternalException('An error occurred while retrieving the role with permissions');
+      this.handleInternalError(error, 'An error occurred while retrieving the role with permissions');
     }
   }
 
@@ -118,11 +118,11 @@ export class RolesService {
       };
       return roleResponse;
     } catch (error) {
-      throw new InternalException('An error occurred while adding the role');
+      this.handleInternalError(error, 'An error occurred while adding the role');
     }
   }
 
-  async updateRole(roleuuid: string, role: Partial<UpdateRoleDto>): Promise<RoleResponseDto> {
+  async updateRole(roleuuid: string, role: UpdateRoleDto): Promise<RoleResponseDto> {
     try {
       const existingRole = await this.roleRepository.findOneBy({
         roleuuid: roleuuid,
@@ -130,8 +130,8 @@ export class RolesService {
 
       if (!existingRole) throw new NotFoundException(`Role with uuid ${roleuuid} not found`, HttpStatus.NOT_FOUND, 'NF_ROLE_ERROR');
 
-      await this.ensureClientDoesNotExist('rolename', role.rolename, 'AEN_ROLE_ERROR');
-      await this.ensureClientDoesNotExist('rolecode', role.rolecode, 'AEC_ROLE_ERROR');
+      if (existingRole && existingRole.rolename !== role.rolename) await this.ensureClientDoesNotExist('rolename', role.rolename, 'AEN_ROLE_ERROR');
+      if (existingRole && existingRole.rolecode !== role.rolecode)  await this.ensureClientDoesNotExist('rolecode', role.rolecode, 'AEC_ROLE_ERROR');
 
       const updatedRole = Object.assign(existingRole, role);
       const savedRole = await this.roleRepository.save(updatedRole);
@@ -144,7 +144,7 @@ export class RolesService {
       };
       return roleResponse;
     } catch (error) {
-      throw new InternalException('An error occurred while updating the role');
+      this.handleInternalError(error, 'An error occurred while updating the role');
     }
   }
 
@@ -167,7 +167,7 @@ export class RolesService {
       };
       return roleResponse;
     } catch (error) {
-      throw new InternalException('An error occurred while updating the role status');
+      this.handleInternalError(error, 'An error occurred while updating the role status');
     }
   }
 
@@ -186,7 +186,7 @@ export class RolesService {
         statusCode: 'SUCCESS',
       }
     } catch (error) {
-      throw new InternalException('An error occurred while deleting the role');
+      this.handleInternalError(error, 'An error occurred while deleting the role');
     }
   }
 
@@ -224,7 +224,7 @@ export class RolesService {
 
       return roleResponse;
     } catch (error) {
-      throw new InternalException('An error occurred while assigning permissions to the role');
+      this.handleInternalError(error, 'An error occurred while assigning permissions to the role');
     }
   }
 
@@ -238,5 +238,19 @@ export class RolesService {
       );
     }
   }
+
+  private handleInternalError(error: unknown, message: string): never {
+    if (error instanceof HttpException) {
+      throw error;
+    }
+    throw new HttpException(
+      {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        errorCode: 'INTERNAL_SERVER_ERROR',
+        message,
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  };
 
 }

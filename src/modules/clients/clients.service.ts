@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
 import { DeepPartial, Repository } from 'typeorm';
@@ -48,7 +48,7 @@ export class ClientsService {
 
             return clientResponseDto;
         } catch (error) {
-            throw new InternalException('An error occurred while retrieving the clients');
+            this.handleInternalError(error, 'An error occurred while getting the clients');
         }
     }
 
@@ -78,7 +78,7 @@ export class ClientsService {
                 workers: client.workers || [],
             } as ClientWithWorkersDto;
         } catch (error) {
-            throw new InternalException('An error occurred while retrieving the client');
+            this.handleInternalError(error, 'An error occurred while getting the client by uuid');
         }
     }
 
@@ -156,7 +156,7 @@ export class ClientsService {
 
             return clientResponse;
         } catch (error) {
-            throw new InternalException('An error occurred while adding the client');
+            this.handleInternalError(error, 'An error occurred while adding the client');
         }
     }
 
@@ -177,7 +177,7 @@ export class ClientsService {
             };
             return clientResponse;
         } catch (error) {
-            throw new InternalException('An error occurred while updating the client status')
+            this.handleInternalError(error, 'An error occurred while updating the client status');
         }
     }
 
@@ -189,10 +189,10 @@ export class ClientsService {
 
             if (!existingClient) throw new NotFoundException(`Client with uuid ${clientuuid} not found`, HttpStatus.NOT_FOUND, 'NF_CLIENT_ERROR');
 
-            await this.ensureClientDoesNotExist('clientname', client.clientname, 'CLIENT_CLIENTNAME_ERROR');
-            await this.ensureClientDoesNotExist('clientphone', client.clientphone, 'CLIENT_CLIENTPHONE_ERROR');
-            await this.ensureClientDoesNotExist('clientidentificationnumber', client.clientidentificationnumber.toString(), 'CLIENT_CLIENTIDNUMBER_ERROR');
-            await this.ensureClientDoesNotExist('clientemail', client.clientemail, 'CLIENT_CLIENTEMAIL_ERROR');
+            if (existingClient && existingClient.clientname !== client.clientname) await this.ensureClientDoesNotExist('clientname', client.clientname, 'CLIENT_CLIENTNAME_ERROR');
+            if (existingClient && existingClient.clientphone !== client.clientphone) await this.ensureClientDoesNotExist('clientphone', client.clientphone, 'CLIENT_CLIENTPHONE_ERROR');
+            if (existingClient && existingClient.clientidentificationnumber !== client.clientidentificationnumber) await this.ensureClientDoesNotExist('clientidentificationnumber', client.clientidentificationnumber.toString(), 'CLIENT_CLIENTIDNUMBER_ERROR');
+            if (existingClient && existingClient.clientemail !== client.clientemail) await this.ensureClientDoesNotExist('clientemail', client.clientemail, 'CLIENT_CLIENTEMAIL_ERROR');
 
             const newClientData: DeepPartial<Client> = {
                 ...client,
@@ -221,7 +221,7 @@ export class ClientsService {
             };
             return clientResponse;
         } catch (error) {
-            throw new InternalException('An error occurred while updating the client');
+            this.handleInternalError(error, 'An error occurred while updating the client');
         }
     }
 
@@ -242,7 +242,7 @@ export class ClientsService {
             };
             return clientResponse;
         } catch (error) {
-            throw new InternalException('An error occurred while updating the client status');
+            this.handleInternalError(error, 'An error occurred while removing the client');
         }
     }
 
@@ -258,4 +258,17 @@ export class ClientsService {
         }
     }
 
+    private handleInternalError(error: unknown, message: string): never {
+        if (error instanceof HttpException) {
+            throw error;
+        }
+        throw new HttpException(
+            {
+                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                errorCode: 'INTERNAL_SERVER_ERROR',
+                message,
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    };
 }

@@ -13,6 +13,9 @@ Manejar permisos globales, es decir que se van axponer a los usuarios, algunas e
 * Desactivar comercios.
 * Entre otros.
 
+
+Hacer los usuarios en cards no tablas
+
 Los Roles cuando se asignen por comercio (cliente) cada uno podra gerstionarse sus propios permisos debera cambiar la validación
 
 Creación de comercios
